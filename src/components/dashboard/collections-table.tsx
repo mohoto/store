@@ -428,8 +428,8 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
           <DialogHeader>
             <DialogTitle>Supprimer la collection</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer la collection "
-              <span className="font-semibold">{collectionToDelete?.nom}</span>" ?
+              Êtes-vous sûr de vouloir supprimer la collection &ldquo;
+              <span className="font-semibold">{collectionToDelete?.nom}</span>&rdquo; ?
               Cette action est irréversible et supprimera également tous les produits associés à cette collection.
             </DialogDescription>
           </DialogHeader>

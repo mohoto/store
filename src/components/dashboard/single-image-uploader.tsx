@@ -16,13 +16,13 @@ interface SingleImageUploaderProps {
   description?: string;
 }
 
-export function SingleImageUploader({ 
-  value, 
-  onChange, 
-  label, 
-  description 
+export function SingleImageUploader({
+  value,
+  onChange,
+  label,
+  description,
 }: SingleImageUploaderProps) {
-  const [uploadMode, setUploadMode] = useState<'url' | 'upload'>('url');
+  const [uploadMode, setUploadMode] = useState<"url" | "upload">("url");
   const [isUploading, setIsUploading] = useState(false);
 
   // Hook UploadThing utilisant l'endpoint existant qui fonctionne
@@ -43,9 +43,9 @@ export function SingleImageUploader({
 
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    
+
     const file = files[0];
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       toast.error("Veuillez sélectionner une image valide");
       return;
     }
@@ -67,25 +67,23 @@ export function SingleImageUploader({
   return (
     <div className="space-y-3">
       <Label className="text-sm font-medium">{label}</Label>
-      {description && (
-        <p className="text-xs text-gray-500">{description}</p>
-      )}
+      {description && <p className="text-xs text-gray-500">{description}</p>}
 
       {/* Mode selection */}
       <div className="flex gap-2">
         <Button
           type="button"
-          variant={uploadMode === 'url' ? 'default' : 'outline'}
+          variant={uploadMode === "url" ? "default" : "outline"}
           size="sm"
-          onClick={() => setUploadMode('url')}
+          onClick={() => setUploadMode("url")}
         >
           URL
         </Button>
         <Button
           type="button"
-          variant={uploadMode === 'upload' ? 'default' : 'outline'}
+          variant={uploadMode === "upload" ? "default" : "outline"}
           size="sm"
-          onClick={() => setUploadMode('upload')}
+          onClick={() => setUploadMode("upload")}
         >
           <Upload className="w-4 h-4 mr-2" />
           Upload
@@ -93,7 +91,7 @@ export function SingleImageUploader({
       </div>
 
       {/* URL Mode */}
-      {uploadMode === 'url' && (
+      {uploadMode === "url" && (
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -103,17 +101,19 @@ export function SingleImageUploader({
       )}
 
       {/* Upload Mode */}
-      {uploadMode === 'upload' && !value && (
+      {uploadMode === "upload" && !value && (
         <div className="border-2 border-dashed border-gray-200 rounded-lg p-6">
           <div className="text-center space-y-4">
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
             <div>
               <label htmlFor="file-upload" className="cursor-pointer">
                 <span className="mt-2 block text-sm font-semibold text-gray-900">
-                  {isUploading ? "Upload en cours..." : "Cliquez pour uploader une image"}
+                  {isUploading
+                    ? "Upload en cours..."
+                    : "Cliquez pour uploader une image"}
                 </span>
                 <span className="mt-1 block text-xs text-gray-500">
-                  PNG, JPG, WebP jusqu'à 4MB
+                  PNG, JPG, WebP jusqu&#39;à 4MB
                 </span>
               </label>
               <input
@@ -159,12 +159,14 @@ export function SingleImageUploader({
                   target.nextElementSibling?.classList.remove("hidden");
                 }}
               />
-              <div className="hidden w-full h-32 bg-gray-100 border rounded flex items-center justify-center">
-                <span className="text-gray-400 text-sm">Image non disponible</span>
+              <div className="w-full h-32 bg-gray-100 border rounded flex items-center justify-center">
+                <span className="text-gray-400 text-sm">
+                  Image non disponible
+                </span>
               </div>
             </div>
           </div>
-          
+
           {/* Show URL for reference */}
           <div className="text-xs text-gray-500 break-all bg-gray-50 p-2 rounded">
             URL: {value}
@@ -174,12 +176,23 @@ export function SingleImageUploader({
 
       {/* Tips */}
       <div className="text-xs text-gray-500">
-        <p>💡 <strong>Conseils :</strong></p>
+        <p>
+          💡 <strong>Conseils :</strong>
+        </p>
         <ul className="ml-4 list-disc space-y-1">
-          <li><strong>URL :</strong> Utilisez une URL complète ou un chemin /images/</li>
-          <li><strong>Upload :</strong> Les images sont hébergées sur UploadThing</li>
-          <li><strong>Format :</strong> JPG, PNG, WebP recommandés</li>
-          <li><strong>Taille :</strong> Maximum 4MB</li>
+          <li>
+            <strong>URL :</strong> Utilisez une URL complète ou un chemin
+            /images/
+          </li>
+          <li>
+            <strong>Upload :</strong> Les images sont hébergées sur UploadThing
+          </li>
+          <li>
+            <strong>Format :</strong> JPG, PNG, WebP recommandés
+          </li>
+          <li>
+            <strong>Taille :</strong> Maximum 4MB
+          </li>
         </ul>
       </div>
     </div>

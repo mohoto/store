@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { collection: string } }
+  context: { params: Promise<{ collection: string }> }
 ) {
   try {
-    const { collection } = params;
+    const { collection } = await context.params;
     console.log("Fetching products for collection:", collection);
 
     /* const products = await prisma.product.findMany({

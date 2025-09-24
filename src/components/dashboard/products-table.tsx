@@ -227,6 +227,7 @@ export function ProductsTable({ data, onDataChange }: ProductsTableProps) {
         });
         setIsDeleteProductDialogOpen(false);
         setProductToDelete(null);
+        onDataChange?.();
         router.refresh();
       } else {
         let errorMessage = "Erreur lors de la suppression du produit";

@@ -1,20 +1,16 @@
 // components/ui/image-upload.tsx
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { UploadButton } from "@/utils/uploadthing";
 import {
   AlertCircle,
-  CheckCircle,
   ImageIcon,
   Loader2,
   Upload,
-  X,
 } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 
 interface ImageUploadProps {
@@ -22,7 +18,6 @@ interface ImageUploadProps {
   maxFiles?: number;
   className?: string;
   disabled?: boolean;
-  multiple?: boolean;
 }
 
 export function ImageUpload({
@@ -30,14 +25,13 @@ export function ImageUpload({
   maxFiles = 1,
   className,
   disabled = false,
-  multiple = false,
 }: ImageUploadProps) {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const handleUploadComplete = (res: any) => {
-    const urls = res.map((file: any) => file.url);
+  const handleUploadComplete = (res: { url: string }[]) => {
+    const urls = res.map((file) => file.url);
     setUploadedImages((prev) => [...prev, ...urls]);
     setIsUploading(false);
     setUploadError(null);
@@ -50,11 +44,6 @@ export function ImageUpload({
     setIsUploading(false);
   };
 
-  const removeImage = (indexToRemove: number) => {
-    setUploadedImages((prev) =>
-      prev.filter((_, index) => index !== indexToRemove)
-    );
-  };
 
   const canUploadMore = uploadedImages.length < maxFiles;
 

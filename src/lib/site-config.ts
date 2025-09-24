@@ -6,13 +6,13 @@ export interface SiteConfig {
   value: string;
   type: string;
   section: string;
-  description?: string;
+  description: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 // Cache pour éviter trop de requêtes à la base de données
-const configCache = new Map<string, { value: any; timestamp: number }>();
+const configCache = new Map<string, { value: string | null; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export async function getSiteConfig(key: string): Promise<string | null> {
@@ -63,7 +63,7 @@ export async function setSiteConfig(
   value: string,
   type: string = "text",
   section: string = "general",
-  description?: string
+  description: string | null = null
 ): Promise<SiteConfig | null> {
   try {
     const config = await prisma.siteConfig.upsert({

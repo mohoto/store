@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface PromoConfig {
   title: string;
@@ -16,17 +16,13 @@ export default function PromoSection() {
     image: "/images/promo-background.jpg",
   });
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  const loadConfig = async () => {
+  const loadConfig = useCallback(async () => {
     try {
       const response = await fetch("/api/site-config");
       const configs = await response.json();
 
       const configMap: Record<string, string> = {};
-      configs.forEach((c: any) => {
+      configs.forEach((c: { key: string; value: string }) => {
         configMap[c.key] = c.value;
       });
 
@@ -39,7 +35,11 @@ export default function PromoSection() {
     } catch (error) {
       console.error("Erreur lors du chargement de la config promo:", error);
     }
-  };
+  }, [config]);
+
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
   return (
     <section className="pt-4 pb-20 bg-white">
       <div className="md:max-w-7xl md:mx-auto w-full">

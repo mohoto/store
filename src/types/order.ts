@@ -1,4 +1,6 @@
-export type OrderStatus = 
+import React from "react";
+
+export type OrderStatus =
   | 'PENDING'     // En attente
   | 'CONFIRMED'   // Confirmée
   | 'PROCESSING'  // En cours de préparation
@@ -127,7 +129,7 @@ export interface OrderFilters {
 export interface StatusConfig {
   label: string;
   variant: 'default' | 'secondary' | 'destructive' | 'outline';
-  icon: any; // Type pour les icônes Tabler
+  icon: React.ComponentType<{ className?: string }>; // Type pour les icônes Tabler
   color: string;
   description: string;
 }

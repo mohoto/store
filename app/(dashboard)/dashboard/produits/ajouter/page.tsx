@@ -1,0 +1,45 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma/client";
+import { SiteHeader } from "@app/(dashboard)/site-header";
+import { AddProductForm } from "./add-product-form";
+
+export default async function Page() {
+  const products = await prisma.product.findMany({
+    include: {
+      variants: true,
+      collections: {
+        include: {
+          collection: true,
+        },
+      },
+    },
+  });
+  console.log(products);
+
+  return (
+    <>
+      <SiteHeader title="Ajouter un produit" />
+      <div className="flex flex-1 flex-col">
+        <div className="@container/main flex flex-1 flex-col gap-2">
+          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+            <div className="px-4 lg:px-6">
+              <div className="grid lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <AddProductForm />
+                </div>
+                <div className="lg:col-span-1">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Tous les produits</CardTitle>
+                    </CardHeader>
+                    <CardContent></CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

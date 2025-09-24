@@ -15,11 +15,12 @@ interface OrderItemInput {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         items: true
       }
@@ -44,9 +45,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const data = await request.json();
     
     const {
@@ -77,7 +79,7 @@ export async function PATCH(
 
     // Vérifier que la commande existe
     const existingOrder = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: { items: true }
     });
 
@@ -92,12 +94,12 @@ export async function PATCH(
     const updatedOrder = await prisma.$transaction(async (tx) => {
       // Supprimer les anciens items
       await tx.orderItem.deleteMany({
-        where: { orderId: params.id }
+        where: { orderId: id }
       });
 
       // Mettre à jour la commande
       await tx.order.update({
-        where: { id: params.id },
+        where: { id: id },
         data: {
           customerName: customerName || null,
           customerEmail: customerEmail || null,
@@ -121,7 +123,7 @@ export async function PATCH(
       if (items && items.length > 0) {
         await tx.orderItem.createMany({
           data: items.map((item: OrderItemInput) => ({
-            orderId: params.id,
+            orderId: id,
             productId: item.productId,
             variantId: item.variantId || null,
             nom: item.nom,
@@ -136,7 +138,7 @@ export async function PATCH(
 
       // Retourner la commande mise à jour avec ses items
       return await tx.order.findUnique({
-        where: { id: params.id },
+        where: { id: id },
         include: { items: true }
       });
     });
@@ -153,12 +155,13 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     // Vérifier que la commande existe et récupérer ses articles
     const existingOrder = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: { items: true } // Inclure les articles pour restaurer les stocks
     });
 
@@ -201,7 +204,7 @@ export async function DELETE(
 
       // Supprimer la commande (les items seront supprimés automatiquement grâce à onDelete: Cascade)
       await tx.order.delete({
-        where: { id: params.id }
+        where: { id: id }
       });
     });
 

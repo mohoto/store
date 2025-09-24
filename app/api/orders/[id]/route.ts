@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/client';
 import { isValidOrderStatus } from '@/lib/order-utils';
 
+interface OrderItemInput {
+  productId: string;
+  variantId?: string;
+  nom: string;
+  prix: number;
+  quantite: number;
+  taille?: string;
+  couleur?: string;
+  image?: string;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -85,7 +96,7 @@ export async function PATCH(
       });
 
       // Mettre à jour la commande
-      const order = await tx.order.update({
+      await tx.order.update({
         where: { id: params.id },
         data: {
           customerName: customerName || null,
@@ -109,7 +120,7 @@ export async function PATCH(
       // Créer les nouveaux items s'ils sont fournis
       if (items && items.length > 0) {
         await tx.orderItem.createMany({
-          data: items.map((item: any) => ({
+          data: items.map((item: OrderItemInput) => ({
             orderId: params.id,
             productId: item.productId,
             variantId: item.variantId || null,

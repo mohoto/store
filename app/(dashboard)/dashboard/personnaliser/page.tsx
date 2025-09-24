@@ -23,7 +23,7 @@ import { useImageUploadStore } from "@/store/ImageUploadStore";
 import { useUploadThing } from "@/utils/uploadthing";
 import { SiteHeader } from "@app/(dashboard)/site-header";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -144,11 +144,7 @@ export default function Page() {
     },
   });
 
-  useEffect(() => {
-    loadConfigurations();
-  }, []);
-
-  const loadConfigurations = async () => {
+  const loadConfigurations = useCallback(async () => {
     try {
       const response = await fetch("/api/site-config");
       const configs = await response.json();
@@ -160,7 +156,7 @@ export default function Page() {
 
       // Créer un map des configurations
       const configMap: Record<string, string> = {};
-      configs.forEach((config: any) => {
+      configs.forEach((config: { key: string; value: string }) => {
         configMap[config.key] = config.value;
       });
 
@@ -237,7 +233,11 @@ export default function Page() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [heroForm, featuredForm, promoForm]);
+
+  useEffect(() => {
+    loadConfigurations();
+  }, [loadConfigurations]);
 
   const createDefaultConfigurations = async () => {
     const defaultConfigs = [
@@ -524,7 +524,7 @@ export default function Page() {
           if (pendingImg && uploadMap[pendingImg.id]) {
             updatedData[key as keyof HeroFormData] = uploadMap[
               pendingImg.id
-            ] as any;
+            ] as string;
           }
         }
       });
@@ -581,7 +581,7 @@ export default function Page() {
           if (pendingImg && uploadMap[pendingImg.id]) {
             updatedData[key as keyof CategoriesFormData] = uploadMap[
               pendingImg.id
-            ] as any;
+            ] as string;
           }
         }
       });
@@ -638,7 +638,7 @@ export default function Page() {
           if (pendingImg && uploadMap[pendingImg.id]) {
             updatedData[key as keyof PromoFormData] = uploadMap[
               pendingImg.id
-            ] as any;
+            ] as string;
           }
         }
       });

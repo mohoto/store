@@ -20,7 +20,7 @@ export function ImageUploader({ value, onChange, label, description }: ImageUplo
   const [uploadMode, setUploadMode] = useState<'url' | 'upload'>('url');
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleUploadComplete = (res: any) => {
+  const handleUploadComplete = (res: { url: string }[]) => {
     if (res?.[0]?.url) {
       onChange(res[0].url);
       toast.success("Image uploadée avec succès");

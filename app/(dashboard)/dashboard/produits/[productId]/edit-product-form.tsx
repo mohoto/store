@@ -36,7 +36,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Collection, TypeProduct } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronDown, Plus, Trash2, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -64,7 +63,6 @@ const productSchema = z.object({
 });
 
 export const EditProductForm = ({ product }: { product: TypeProduct }) => {
-  const router = useRouter();
   const { pendingImages, clearPendingImages, resetAll } = useImageUploadStore();
 
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -81,9 +79,9 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [variantToDelete, setVariantToDelete] = useState<{
     index: number;
-    fieldOnChange: (value: any) => void;
+    fieldOnChange: (value: unknown[]) => void;
   } | null>(null);
-  const fieldOnChangeRef = useRef<((value: any) => void) | null>(null);
+  const fieldOnChangeRef = useRef<((value: unknown[]) => void) | null>(null);
 
   // Listes prédéfinies pour les variantes
   const tailles = [

@@ -79,9 +79,9 @@ export const AddProductForm = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [variantToDelete, setVariantToDelete] = useState<{
     index: number;
-    fieldOnChange: (value: any) => void;
+    fieldOnChange: (value: unknown[]) => void;
   } | null>(null);
-  const fieldOnChangeRef = useRef<((value: any) => void) | null>(null);
+  const fieldOnChangeRef = useRef<((value: unknown[]) => void) | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Store pour les images

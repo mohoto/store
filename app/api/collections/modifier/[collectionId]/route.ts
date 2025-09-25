@@ -27,7 +27,6 @@ export async function PATCH(
       data: {
         nom: validatedData.nom,
         description: validatedData.description,
-        image: validatedData.image,
       },
     });
     return NextResponse.json(updatedCollection, { status: 201 });

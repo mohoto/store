@@ -1,8 +1,7 @@
 export type Collection = {
   id: string;
   nom: string;
-  description: string;
-  image: string;
+  description: string | null;
   slug: string;
   createdAt: Date;
   updatedAt: Date;
@@ -32,9 +31,9 @@ export type TypeProduct = {
   id: string;
   nom: string;
   slug: string;
-  description: string;
+  description: string | null;
   prix: number;
-  prixReduit: number;
+  prixReduit: number | null;
   images: string[];
   quantity: number | null;
   createdAt: Date;

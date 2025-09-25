@@ -1,7 +1,6 @@
-import { prisma } from "@/lib/prisma/client";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { createSlug } from "@/lib/utils";
 import { Collection } from "@/types/product";
-import Error from "next/error";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
@@ -73,13 +72,13 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(newProduct, { status: 201 });
-  } catch (error: Error) {
+  } catch (error) {
     console.error("Error creating product:", error);
-    console.error("Error details:", error.message);
+    console.error("Error details:", error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
       {
         error: "Erreur lors de la création du produit",
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

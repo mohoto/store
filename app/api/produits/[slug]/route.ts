@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma/client";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -44,7 +44,7 @@ export async function GET(
     return NextResponse.json(
       {
         error: "Erreur lors de la récupération du produit",
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

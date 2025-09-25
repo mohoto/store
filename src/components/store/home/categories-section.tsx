@@ -73,7 +73,7 @@ export default function CategoriesSection() {
       const configs = await response.json();
 
       const configMap: Record<string, string> = {};
-      configs.forEach((c: Category) => {
+      configs.forEach((c: { key: string; value: string }) => {
         configMap[c.key] = c.value;
       });
 

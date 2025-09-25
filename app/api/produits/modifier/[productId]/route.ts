@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma/client";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { createSlug } from "@/lib/utils";
 import { Collection } from "@/types/product";
 import { NextRequest, NextResponse } from "next/server";

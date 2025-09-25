@@ -26,7 +26,6 @@ export default function UploadImages({ value, onChange }: UploadImagesProps) {
         <h3 className="text-xl font-semibold mb-4">Images du produit</h3>
         <ImageUpload
           maxFiles={8}
-          multiple={true}
           onUploadComplete={handleUploadComplete}
         />
 

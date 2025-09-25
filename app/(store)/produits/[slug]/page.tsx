@@ -361,7 +361,7 @@ export default function Page() {
                           <label
                             key={couleur}
                             className="relative cursor-pointer group"
-                            title={couleur}
+                            title={couleur || undefined}
                           >
                             <input
                               type="radio"

@@ -233,7 +233,7 @@ export default function Page() {
     } finally {
       setIsLoading(false);
     }
-  }, [heroForm, featuredForm, promoForm]);
+  }, [heroForm, promoForm]);
 
   useEffect(() => {
     loadConfigurations();

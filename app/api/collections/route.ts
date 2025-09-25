@@ -29,7 +29,6 @@ export async function POST(req: NextRequest) {
         nom: validatedData.nom,
         slug: slug,
         description: validatedData.description,
-        image: validatedData.image,
       },
     });
 

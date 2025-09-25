@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma/client";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
           }
         } catch (error) {
           console.error(`Erreur pour le produit ${productId}:`, error);
-          return { productId, success: false, error: error.message };
+          return { productId, success: false, error: error instanceof Error ? error.message : 'Unknown error' };
         }
       })
     );

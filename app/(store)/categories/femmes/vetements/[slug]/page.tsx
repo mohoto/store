@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { prisma } from "@/lib/prisma/client";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { Collection, TypeProduct } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
@@ -54,6 +54,7 @@ export default async function Page(props: {
       ],
     },
     include: {
+      variants: true,
       collections: {
         include: {
           collection: true,

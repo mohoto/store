@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma/client";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { SiteHeader } from "@app/(dashboard)/site-header";
 import { AddProductForm } from "./add-product-form";
 

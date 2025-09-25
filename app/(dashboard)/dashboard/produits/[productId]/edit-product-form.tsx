@@ -125,7 +125,6 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
           setCollections(data);
         }
       } catch (error) {
-        console.log(error);
       }
     };
     getColections();
@@ -225,21 +224,17 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
   };
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
-    console.log("Form values:", values);
-    console.log("Pending images:", pendingImages);
     
     try {
       let imageUrls = values.images || [];
       
       // Upload pending images if there are any
       if (pendingImages.length > 0) {
-        console.log("Uploading pending images...");
         try {
           const uploadedImages = await uploadFiles("imageUploader", {
             files: pendingImages.map(img => img.file),
           });
           
-          console.log("Upload result:", uploadedImages);
           
           if (uploadedImages && uploadedImages.length > 0) {
             const newImageUrls = uploadedImages.map(img => img.url);

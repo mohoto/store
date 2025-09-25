@@ -14,7 +14,6 @@ export default async function Page() {
       },
     },
   });
-  console.log(products);
 
   return (
     <>

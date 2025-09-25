@@ -82,8 +82,8 @@ export default function Page() {
 
   // Hook UploadThing
   const { startUpload } = useUploadThing("imageUploader", {
-    onClientUploadComplete: (res) => {
-      console.log("Images uploadées:", res);
+    onClientUploadComplete: () => {
+      // Upload completed successfully
     },
     onUploadError: (error: Error) => {
       console.error("Erreur upload:", error);

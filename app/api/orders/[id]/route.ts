@@ -159,6 +159,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params;
+
     // Vérifier que la commande existe et récupérer ses articles
     const existingOrder = await prisma.order.findUnique({
       where: { id: id },
@@ -172,32 +173,39 @@ export async function DELETE(
       );
     }
 
+
     // Utiliser une transaction pour supprimer la commande et restaurer les stocks
     await prisma.$transaction(async (tx) => {
       // Restaurer les stocks seulement si la commande n'était pas déjà annulée
       if (existingOrder.status !== 'CANCELLED') {
+
         // Parcourir chaque article de la commande pour restaurer les quantités
         for (const item of existingOrder.items) {
-          if (item.variantId) {
-            // Restaurer le stock de la variante
-            await tx.productVariant.update({
-              where: { id: item.variantId },
-              data: {
-                quantity: {
-                  increment: item.quantite, // Ajouter la quantité commandée
+          try {
+            if (item.variantId) {
+              // Restaurer le stock de la variante
+              await tx.productVariant.update({
+                where: { id: item.variantId },
+                data: {
+                  quantity: {
+                    increment: item.quantite, // Ajouter la quantité commandée
+                  },
                 },
-              },
-            });
-          } else {
-            // Restaurer le stock du produit principal
-            await tx.product.update({
-              where: { id: item.productId },
-              data: {
-                quantity: {
-                  increment: item.quantite, // Ajouter la quantité commandée
+              });
+            } else {
+              // Restaurer le stock du produit principal
+              await tx.product.update({
+                where: { id: item.productId },
+                data: {
+                  quantity: {
+                    increment: item.quantite, // Ajouter la quantité commandée
+                  },
                 },
-              },
-            });
+              });
+            }
+          } catch (stockError) {
+            console.warn('Erreur lors de la restauration du stock pour l\'article:', item.id, stockError);
+            // Continuer même si la restauration de stock échoue
           }
         }
       }
@@ -206,13 +214,36 @@ export async function DELETE(
       await tx.order.delete({
         where: { id: id }
       });
+
     });
 
-    return NextResponse.json({ message: 'Commande supprimée avec succès' });
+    return NextResponse.json({
+      success: true,
+      message: 'Commande supprimée avec succès',
+      orderId: id
+    });
   } catch (error) {
     console.error('Erreur lors de la suppression de la commande:', error);
+
+    // Gestion spécifique des erreurs Prisma
+    if (error instanceof Error) {
+      if (error.message.includes('Record to delete does not exist')) {
+        return NextResponse.json(
+          { error: 'Commande déjà supprimée ou inexistante' },
+          { status: 404 }
+        );
+      }
+
+      if (error.message.includes('Foreign key constraint')) {
+        return NextResponse.json(
+          { error: 'Impossible de supprimer la commande car elle est liée à d\'autres données' },
+          { status: 400 }
+        );
+      }
+    }
+
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+      { error: 'Erreur interne du serveur', details: error instanceof Error ? error.message : 'Erreur inconnue' },
       { status: 500 }
     );
   }

@@ -89,8 +89,7 @@ export const AddProductForm = () => {
 
   // Hook UploadThing
   const { startUpload } = useUploadThing("imageUploader", {
-    onClientUploadComplete: (res) => {
-      console.log("Upload terminé:", res);
+    onClientUploadComplete: () => {
     },
     onUploadError: (error: Error) => {
       console.error("Erreur upload:", error);
@@ -140,7 +139,6 @@ export const AddProductForm = () => {
           setCollections(data);
         }
       } catch (error) {
-        console.log(error);
       }
     };
     getColections();
@@ -250,14 +248,12 @@ export const AddProductForm = () => {
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     setIsSubmitting(true);
-    console.log("Début de la soumission avec:", values);
 
     try {
       let finalImageUrls = [...values.images];
 
       // Upload des images en attente
       if (pendingImages.length > 0) {
-        console.log(`Upload de ${pendingImages.length} images...`);
         const uploadedUrls = await uploadImagesToUploadThing(
           pendingImages.map((img) => img.file)
         );
@@ -272,7 +268,6 @@ export const AddProductForm = () => {
         images: finalImageUrls,
       };
 
-      console.log("Données finales à envoyer:", productData);
 
       const response = await fetch("/api/produits", {
         method: "POST",
@@ -283,8 +278,7 @@ export const AddProductForm = () => {
       });
 
       if (response.ok) {
-        const newProduct = await response.json();
-        console.log("Produit créé:", newProduct);
+        await response.json();
 
         // Reset complet du store
         resetAll();

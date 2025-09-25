@@ -38,7 +38,6 @@ export default async function Page() {
     },
   });
 
-  console.log(products);
 
   return (
     <div className="container mx-auto px-4 py-8">

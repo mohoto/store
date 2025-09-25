@@ -15,8 +15,6 @@ export async function GET(_req: NextRequest) {
       },
     });
 
-    console.log(products);
-
     return NextResponse.json(products, { status: 200 });
   } catch (error) {
     console.error("Error fetching collection:", error);

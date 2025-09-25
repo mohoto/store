@@ -101,13 +101,11 @@ export const useOrder = () => {
       if (!response.ok) {
         if (response.status === 409) {
           // Commande existe déjà, pas vraiment une erreur
-          console.log("Commande existe déjà:", data.order);
           return data;
         }
         throw new Error(data.error || "Erreur lors de la création de la commande");
       }
 
-      console.log("Commande créée avec succès:", data);
       return data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";

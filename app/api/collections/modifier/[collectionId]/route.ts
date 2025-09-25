@@ -50,7 +50,6 @@ export async function DELETE(
   try {
     const { collectionId } = await params;
     
-    console.log("DELETE collection called with ID:", collectionId);
     
     // Vérifier si la collection existe
     const existingCollection = await prisma.collection.findUnique({
@@ -69,7 +68,6 @@ export async function DELETE(
       );
     }
 
-    console.log("Found collection:", existingCollection.nom, "with", existingCollection.products.length, "products");
 
     // Supprimer d'abord toutes les relations ProductCollection
     await prisma.productCollection.deleteMany({
@@ -78,7 +76,6 @@ export async function DELETE(
       },
     });
 
-    console.log("Deleted ProductCollection relations");
 
     // Ensuite supprimer la collection
     const deletedCollection = await prisma.collection.delete({
@@ -87,7 +84,6 @@ export async function DELETE(
       },
     });
 
-    console.log("Collection deleted successfully:", deletedCollection.nom);
 
     return NextResponse.json(
       { message: "Collection supprimée avec succès", collection: deletedCollection },

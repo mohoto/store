@@ -11,7 +11,6 @@ export default async function Page(props: {
   }>;
 }) {
   const params = await props.params;
-  console.log(params);
 
   // Récupérer toutes les collections pour la navigation
   const collections = await prisma.collection.findMany({
@@ -70,7 +69,6 @@ export default async function Page(props: {
     },
   });
 
-  console.log(products);
 
   return (
     <div className="container mx-auto px-4 py-8">

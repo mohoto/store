@@ -52,14 +52,10 @@ export const EditCollectionForm = ({
   }, [collection, form]);
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
-    console.log("Form values:", values);
-
     try {
       const collectionData = {
         ...values,
       };
-
-      console.log("Sending collection data:", collectionData);
 
       const response = await fetch(
         `/api/collections/modifier/${collection.id}`,
@@ -72,7 +68,6 @@ export const EditCollectionForm = ({
         }
       );
 
-      console.log("Response status:", response.status);
 
       if (response.ok) {
         // Vérifier si la réponse contient du JSON
@@ -90,7 +85,6 @@ export const EditCollectionForm = ({
           }
         }
 
-        console.log("Collection modifiée:", updatedCollection);
 
         toast.success("Collection modifiée avec succès", {
           position: "top-center",

@@ -73,7 +73,6 @@ export default function SignIn() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     await signUp.email(
       {
         name: values.name,
@@ -87,7 +86,6 @@ export default function SignIn() {
         },
         onError: (error) => {
           toast.error(error.error.message);
-          console.log(error);
         },
       }
     );

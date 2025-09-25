@@ -13,7 +13,6 @@ export default function Page({
       attribute="class"
       defaultTheme="system"
       enableSystem
-      disableTransitionOnChange
     >
       <SidebarProvider
         style={

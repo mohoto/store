@@ -26,7 +26,6 @@ export async function GET(
       },
     });
 
-    console.log("Produit trouvé:", product);
 
     if (!product) {
       return NextResponse.json(
@@ -89,7 +88,6 @@ export async function DELETE(
       },
     });
 
-    console.log("Produit supprimé avec succès:", existingProduct.id);
 
     return NextResponse.json(
       {

@@ -35,14 +35,12 @@ export const AddCollectionForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
-    console.log("Form values:", values);
 
     try {
       const collectionData = {
         ...values,
       };
 
-      console.log("Sending collection data:", collectionData);
 
       const response = await fetch("/api/collections", {
         method: "POST",
@@ -52,12 +50,9 @@ export const AddCollectionForm = () => {
         body: JSON.stringify(collectionData),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers.get("content-type"));
 
       // Récupérer le texte brut de la réponse d'abord
       const responseText = await response.text();
-      console.log("Response text:", responseText);
 
       if (response.ok) {
         // Essayer de parser le JSON seulement si on a une réponse
@@ -65,7 +60,6 @@ export const AddCollectionForm = () => {
         if (responseText.trim()) {
           try {
             newCollection = JSON.parse(responseText);
-            console.log("Collection créée:", newCollection);
           } catch (parseError) {
             console.warn(
               "Could not parse success response as JSON:",

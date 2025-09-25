@@ -18,11 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  formatPrice,
-  getStatusConfig,
-  STATUS_CONFIG,
-} from "@/lib/order-utils";
+import { formatPrice, getStatusConfig, STATUS_CONFIG } from "@/lib/order-utils";
 import { Order, OrderStatus } from "@/types/order";
 import {
   IconEdit,
@@ -159,11 +155,13 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
   return (
     <>
       {/* Filtres */}
-      <div className="flex items-center justify-between gap-4 mb-6 p-4 bg-white dark:bg-gray-800 border rounded-lg">
+      <div className="flex items-center justify-between gap-4 mb-6 p-4 bg-white dark:bg-card border rounded-lg">
         <div className="flex items-center gap-4 flex-1">
           <div className="flex items-center gap-2">
             <IconFilter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtres:</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Filtres:
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -210,7 +208,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       </div>
 
       {/* Table */}
-      <div className="border rounded-lg bg-white dark:bg-gray-800">
+      <div className="border rounded-lg bg-white dark:bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -302,7 +300,9 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+                        <span className="text-sm text-gray-400 dark:text-gray-500">
+                          -
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>

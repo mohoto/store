@@ -148,7 +148,8 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [collectionToDelete, setCollectionToDelete] = React.useState<Collection | null>(null);
+  const [collectionToDelete, setCollectionToDelete] =
+    React.useState<Collection | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
 
   const handleEdit = (collection: Collection) => {
@@ -165,30 +166,28 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
 
     setIsDeleting(true);
     try {
-      console.log("Deleting collection:", collectionToDelete.id);
-      
-      const response = await fetch(`/api/collections/modifier/${collectionToDelete.id}`, {
-        method: "DELETE",
-      });
 
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers.get("content-type"));
-      
+      const response = await fetch(
+        `/api/collections/modifier/${collectionToDelete.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+
       // Récupérer le texte brut de la réponse d'abord
       const responseText = await response.text();
-      console.log("Response text:", responseText);
 
       if (response.ok) {
         // Essayer de parser le JSON seulement si on a une réponse
-        let responseData = null;
         if (responseText.trim()) {
           try {
-            responseData = JSON.parse(responseText);
+            JSON.parse(responseText);
           } catch (parseError) {
             console.warn("Could not parse response as JSON:", parseError);
           }
         }
-        
+
         toast.success("Collection supprimée avec succès", {
           position: "top-center",
         });
@@ -203,12 +202,16 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
             errorData = JSON.parse(responseText);
           } catch (parseError) {
             console.warn("Could not parse error response as JSON:", parseError);
-            errorData = { error: responseText || "Erreur lors de la suppression" };
+            errorData = {
+              error: responseText || "Erreur lors de la suppression",
+            };
           }
         }
-        
+
         console.error("Erreur lors de la suppression:", errorData);
-        toast.error(errorData.error || "Erreur lors de la suppression de la collection");
+        toast.error(
+          errorData.error || "Erreur lors de la suppression de la collection"
+        );
       }
     } catch (error) {
       console.error("Network or other error:", error);
@@ -299,7 +302,7 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border bg-white dark:bg-gray-800">
+      <div className="rounded-md border bg-white dark:bg-card shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -356,7 +359,9 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Lignes par page</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Lignes par page
+            </p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -429,8 +434,9 @@ export function CollectionsTable({ data }: CollectionsTableProps) {
             <DialogTitle>Supprimer la collection</DialogTitle>
             <DialogDescription>
               Êtes-vous sûr de vouloir supprimer la collection &ldquo;
-              <span className="font-semibold">{collectionToDelete?.nom}</span>&rdquo; ?
-              Cette action est irréversible et supprimera également tous les produits associés à cette collection.
+              <span className="font-semibold">{collectionToDelete?.nom}</span>
+              &rdquo; ? Cette action est irréversible et supprimera également
+              tous les produits associés à cette collection.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

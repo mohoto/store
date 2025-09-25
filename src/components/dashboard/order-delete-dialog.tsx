@@ -35,13 +35,22 @@ export function OrderDeleteDialog({
     setIsLoading(true);
 
     try {
+
       const response = await fetch(`/api/orders/${order.id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
+
       if (!response.ok) {
-        throw new Error("Erreur lors de la suppression de la commande");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Erreur de l'API:", errorData);
+        throw new Error(errorData.error || `Erreur ${response.status}: ${response.statusText}`);
       }
+
+      await response.json();
 
       toast.success("Commande supprimée avec succès", {
         position: "top-center",
@@ -53,10 +62,13 @@ export function OrderDeleteDialog({
 
       onClose();
     } catch (error) {
-      toast.error("Erreur lors de la suppression de la commande", {
-        position: "top-center",
-      });
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de la suppression de la commande";
       console.error("Error deleting order:", error);
+
+      toast.error(errorMessage, {
+        position: "top-center",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }

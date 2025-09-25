@@ -28,6 +28,7 @@ export default function Video() {
               src="/video/video-bag.mp4"
               title="Video player"
               controls
+              muted
               className="w-full h-full rounded-lg"
             >
               Votre navigateur ne supporte pas la lecture de vidéos.

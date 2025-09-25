@@ -6,7 +6,6 @@ export async function GET(
 ) {
   try {
     const { collection } = await context.params;
-    console.log("Fetching products for collection:", collection);
 
     /* const products = await prisma.product.findMany({
       where: {
@@ -19,8 +18,6 @@ export async function GET(
         },
       },
     });
-
-    console.log(products);
 
     return NextResponse.json(products, { status: 200 }); */
     return NextResponse.json([], { status: 200 });

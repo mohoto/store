@@ -467,7 +467,7 @@ export function ProductsTable({ data, onDataChange }: ProductsTableProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border bg-white dark:bg-gray-800">
+      <div className="rounded-md border bg-white dark:bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>

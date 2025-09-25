@@ -27,7 +27,7 @@ import {
   IconCircleCheck,
 } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -43,7 +43,8 @@ const customerSchema = z.object({
   country: z.enum(["France", "Belgique"]),
 });
 
-export default function OrderConfirmationPage() {
+// Composant qui contient la logique utilisant useSearchParams
+function OrderConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items, getTotalPrice, clearCart } = useCartStore();
@@ -703,5 +704,18 @@ export default function OrderConfirmationPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// Composant principal qui encapsule avec Suspense
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
+        <div className="text-lg text-gray-600">Chargement...</div>
+      </div>
+    }>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }

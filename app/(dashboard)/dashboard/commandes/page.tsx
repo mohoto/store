@@ -5,6 +5,8 @@ import { Order } from "@/types/order";
 import { SiteHeader } from "@app/(dashboard)/site-header";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 async function getOrders(): Promise<Order[]> {
   try {
     const orders = await prisma.order.findMany({

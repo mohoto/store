@@ -5,6 +5,8 @@ import { Collection } from "@/types/product";
 import { SiteHeader } from "@app/(dashboard)/site-header";
 import { Suspense } from "react";
 
+export const dynamic = 'force-dynamic';
+
 async function getCollections(): Promise<Collection[]> {
   try {
     const collections = await prisma.collection.findMany();

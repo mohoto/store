@@ -5,6 +5,8 @@ import { TypeProduct } from "@/types/product";
 import { SiteHeader } from "@app/(dashboard)/site-header";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 async function getProducts(): Promise<TypeProduct[]> {
   try {
     const products = await prisma.product.findMany({

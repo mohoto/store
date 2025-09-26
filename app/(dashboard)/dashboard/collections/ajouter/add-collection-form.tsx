@@ -52,36 +52,14 @@ export const AddCollectionForm = () => {
         body: JSON.stringify(collectionData),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
-
       if (response.ok) {
-        const responseText = await response.text();
-        console.log("Response text:", responseText);
-
-        try {
-          const newCollection = JSON.parse(responseText);
-          console.log("Collection créée avec succès:", newCollection);
-
-          form.reset();
-          router.push("/dashboard/collections");
-        } catch (parseError) {
-          console.error("JSON parse error:", parseError);
-          console.error("Raw response:", responseText);
-        }
+        const newCollection = await response.json();
+        form.reset();
+        router.push("/dashboard/collections");
       } else {
-        const responseText = await response.text();
-        console.log("Error response text:", responseText);
-
-        let errorData;
-        try {
-          errorData = JSON.parse(responseText);
-        } catch (parseError) {
-          errorData = { error: responseText || "Erreur lors de la création" };
-        }
-
-        console.error("API Error:", errorData);
+        const errorData = await response.json().catch(() => ({
+          error: "Erreur lors de la création"
+        }));
         console.error("Erreur lors de la création:", response.status, errorData);
       }
     } catch (error) {

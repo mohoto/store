@@ -58,7 +58,15 @@ export function OrderStatusDialog({
         throw new Error("Erreur lors de la mise à jour du statut");
       }
 
-      toast.success("Statut mis à jour avec succès", {
+      // Message de succès adapté selon le changement de statut
+      let successMessage = "Statut mis à jour avec succès";
+      if (currentStatus === "CANCELLED" && selectedStatus !== "CANCELLED") {
+        successMessage = "Statut mis à jour - les quantités ont été retirées du stock";
+      } else if (selectedStatus === "CANCELLED" && currentStatus !== "CANCELLED") {
+        successMessage = "Commande annulée - les quantités ont été remises en stock";
+      }
+
+      toast.success(successMessage, {
         position: "top-center",
       });
 
@@ -86,6 +94,24 @@ export function OrderStatusDialog({
         </DialogHeader>
 
         <div className="py-4">
+          {/* Avertissement sur l'impact des stocks */}
+          {((currentStatus === "CANCELLED" && selectedStatus !== "CANCELLED") ||
+            (selectedStatus === "CANCELLED" && currentStatus !== "CANCELLED")) && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <div className="h-4 w-4 bg-yellow-400 rounded-full mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-yellow-800 mb-1">Impact sur les stocks :</p>
+                  <p className="text-yellow-700">
+                    {currentStatus === "CANCELLED" && selectedStatus !== "CANCELLED"
+                      ? "Les quantités de cette commande seront retirées du stock disponible."
+                      : "Les quantités de cette commande seront remises en stock."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <RadioGroup
             value={selectedStatus}
             onValueChange={(value) => setSelectedStatus(value as OrderStatus)}
@@ -120,13 +146,18 @@ export function OrderStatusDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isLoading}
+            className="cursor-pointer"
+          >
             Annuler
           </Button>
           <Button
             onClick={handleUpdateStatus}
             disabled={isLoading}
-            className="ml-2"
+            className="ml-2 cursor-pointer"
           >
             {isLoading ? "Mise à jour..." : "Mettre à jour"}
           </Button>

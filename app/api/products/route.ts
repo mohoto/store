@@ -10,6 +10,11 @@ export async function GET() {
             collection: true,
           },
         },
+        variants: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",

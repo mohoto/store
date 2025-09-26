@@ -36,10 +36,17 @@ import { OrderStatusDialog } from "./order-status-dialog";
 
 interface OrdersTableProps {
   orders: Order[];
+  onStatusUpdate?: (orderId: string, newStatus: OrderStatus) => void;
+  onOrderUpdate?: (orderId: string, updatedOrder: Order) => void;
+  onOrderDeleted?: (orderId: string) => void;
 }
 
-export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+export function OrdersTable({
+  orders,
+  onStatusUpdate,
+  onOrderUpdate,
+  onOrderDeleted
+}: OrdersTableProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
@@ -56,13 +63,11 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
 
   const handleStatusUpdate = useCallback(
     (orderId: string, newStatus: OrderStatus) => {
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
-      );
+      if (onStatusUpdate) {
+        onStatusUpdate(orderId, newStatus);
+      }
     },
-    []
+    [onStatusUpdate]
   );
 
   const handleEditClick = useCallback((order: Order) => {
@@ -72,11 +77,11 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
 
   const handleOrderUpdate = useCallback(
     (orderId: string, updatedOrder: Order) => {
-      setOrders((prevOrders) =>
-        prevOrders.map((order) => (order.id === orderId ? updatedOrder : order))
-      );
+      if (onOrderUpdate) {
+        onOrderUpdate(orderId, updatedOrder);
+      }
     },
-    []
+    [onOrderUpdate]
   );
 
   const handleDeleteClick = useCallback((order: Order) => {
@@ -85,10 +90,10 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
   }, []);
 
   const handleOrderDeleted = useCallback((orderId: string) => {
-    setOrders((prevOrders) =>
-      prevOrders.filter((order) => order.id !== orderId)
-    );
-  }, []);
+    if (onOrderDeleted) {
+      onOrderDeleted(orderId);
+    }
+  }, [onOrderDeleted]);
 
   // Filtrage des données
   const filteredOrders = useMemo(() => {

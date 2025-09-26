@@ -2,7 +2,6 @@
 
 import {
   IconCamera,
-  IconDashboard,
   IconFileAi,
   IconFileDescription,
   IconInnerShadowTop,
@@ -11,9 +10,9 @@ import {
   IconSettings,
   IconShoppingCart,
   IconTag,
-  IconUsers,
 } from "@tabler/icons-react";
 
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +23,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavMain } from "@app/(dashboard)/nav-main";
-import { NavSecondary } from "@app/(dashboard)/nav-secondary";
 import { NavUser } from "@app/(dashboard)/nav-user";
 import { NavWebSite } from "./nav-website";
 
@@ -50,11 +48,11 @@ const data = {
       url: "/dashboard/collections",
       icon: IconTag,
     },
-    {
+    /* {
       title: "Clients",
       url: "/dashboard/clients",
       icon: IconUsers,
-    },
+    }, */
   ],
   navClouds: [
     {
@@ -141,10 +139,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavWebSite items={data.website} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full mb-4 mt-2 cursor-pointer"
+        >
+          Se déconnecter
+        </Button>
       </SidebarFooter>
     </Sidebar>
   );

@@ -27,7 +27,7 @@ import {
   IconCircleCheck,
 } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -125,7 +125,9 @@ function OrderConfirmationContent() {
     const itemsList = items
       .map(
         (item) =>
-          `• ${item.nom}${item.taille ? ` (Taille: ${item.taille})` : ""}${item.couleur ? ` (Couleur: ${item.couleur})` : ""} x${item.quantite} - ${(item.prix * item.quantite).toFixed(2)}€`
+          `• ${item.nom}${item.taille ? ` (Taille: ${item.taille})` : ""}${
+            item.couleur ? ` (Couleur: ${item.couleur})` : ""
+          } x${item.quantite} - ${(item.prix * item.quantite).toFixed(2)}€`
       )
       .join("\n");
 
@@ -643,7 +645,7 @@ function OrderConfirmationContent() {
                 disabled={!formCompleted || isSavingOrder}
                 className={`w-full h-12 text-lg ${
                   formCompleted
-                    ? "bg-green-600 hover:bg-green-700 cursor pointer"
+                    ? "bg-green-600 hover:bg-green-700 cursor-pointer"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
                 size="lg"
@@ -652,8 +654,8 @@ function OrderConfirmationContent() {
                 {isSavingOrder
                   ? "Sauvegarde..."
                   : formCompleted
-                    ? "Finaliser avec WhatsApp"
-                    : "Complétez vos informations d'abord"}
+                  ? "Finaliser avec WhatsApp"
+                  : "Complétez vos informations d'abord"}
               </Button>
 
               {/* <div className="grid grid-cols-2 gap-3">
@@ -682,21 +684,10 @@ function OrderConfirmationContent() {
         {/* Informations de contact */}
         <Card>
           <CardContent className="p-6">
-            <h2 className="text-lg font-semibold mb-3">Besoin d&#39;aide ?</h2>
-            <div className="text-sm text-gray-600 space-y-2">
-              <p>
-                • Numéro de commande:{" "}
-                <span className="font-medium">#{orderNumber}</span>
-              </p>
-              <p>• Email: support@monstore.com</p>
-              <p>• Téléphone: +33 1 23 45 67 89</p>
-              <p>• Horaires: Lun-Ven 9h-18h, Sam 10h-16h</p>
-            </div>
-
             <Button
               variant="outline"
               onClick={() => router.push("/")}
-              className="w-full mt-4"
+              className="w-full mt-4 cursor-pointer"
             >
               Retourner à l&#39;accueil
             </Button>
@@ -710,11 +701,13 @@ function OrderConfirmationContent() {
 // Composant principal qui encapsule avec Suspense
 export default function OrderConfirmationPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
-        <div className="text-lg text-gray-600">Chargement...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
+          <div className="text-lg text-gray-600">Chargement...</div>
+        </div>
+      }
+    >
       <OrderConfirmationContent />
     </Suspense>
   );

@@ -85,7 +85,9 @@ export default function AjouterCommandePage() {
     null
   );
   const [quantity, setQuantity] = useState(1);
-  const [discountType, setDiscountType] = useState<"percentage" | "amount">("percentage");
+  const [discountType, setDiscountType] = useState<"percentage" | "amount">(
+    "percentage"
+  );
   const [discountValue, setDiscountValue] = useState(0);
 
   const {
@@ -208,7 +210,9 @@ export default function AjouterCommandePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Erreur lors de la création de la commande");
+        throw new Error(
+          errorData.error || "Erreur lors de la création de la commande"
+        );
       }
 
       await response.json();
@@ -219,9 +223,14 @@ export default function AjouterCommandePage() {
 
       router.push("/dashboard/commandes");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erreur lors de la création de la commande", {
-        position: "top-center",
-      });
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la création de la commande",
+        {
+          position: "top-center",
+        }
+      );
       console.error("Error creating order:", error);
     } finally {
       setIsLoading(false);
@@ -233,14 +242,22 @@ export default function AjouterCommandePage() {
       {/* En-tête */}
       <div className="flex items-center gap-4 mb-8">
         <Link href="/dashboard/commandes">
-          <Button variant="outline" size="sm" className="flex items-center gap-2 cursor-pointer">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <IconArrowLeft className="h-4 w-4" />
             Retour
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Nouvelle commande</h1>
-          <p className="text-gray-600">Créer une nouvelle commande client</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Nouvelle commande
+          </h1>
+          <p className="text-gray-700 dark:text-gray-300">
+            Créer une nouvelle commande client
+          </p>
         </div>
       </div>
 
@@ -258,7 +275,10 @@ export default function AjouterCommandePage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="customerName" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="customerName"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Nom du client
                 </Label>
                 <Input
@@ -269,7 +289,10 @@ export default function AjouterCommandePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customerEmail" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="customerEmail"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Adresse email
                 </Label>
                 <Input
@@ -288,7 +311,10 @@ export default function AjouterCommandePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="customerPhone" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="customerPhone"
+                className="text-sm font-medium text-gray-700"
+              >
                 Numéro de téléphone
               </Label>
               <Input
@@ -313,7 +339,10 @@ export default function AjouterCommandePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="customerStreet" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="customerStreet"
+                className="text-sm font-medium text-gray-700"
+              >
                 Adresse
               </Label>
               <Input
@@ -326,7 +355,10 @@ export default function AjouterCommandePage() {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="customerPostalCode" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="customerPostalCode"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Code postal
                 </Label>
                 <Input
@@ -337,7 +369,10 @@ export default function AjouterCommandePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customerCity" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="customerCity"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Ville
                 </Label>
                 <Input
@@ -348,7 +383,10 @@ export default function AjouterCommandePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customerCountry" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="customerCountry"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Pays
                 </Label>
                 <Input
@@ -371,7 +409,7 @@ export default function AjouterCommandePage() {
               </div>
               <div className="flex items-center justify-between w-full">
                 <span>Articles de la commande</span>
-                <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                <div className="text-sm text-gray-600 bg-gray-100 dark:bg-card px-3 py-1 rounded-full">
                   {orderItems.length} article{orderItems.length > 1 ? "s" : ""}
                 </div>
               </div>
@@ -382,10 +420,12 @@ export default function AjouterCommandePage() {
               <div className="border rounded-lg overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gray-50/50">
+                    <TableRow className="bg-gray-50/50 dark:bg-card">
                       <TableHead className="font-semibold">Produit</TableHead>
                       <TableHead className="font-semibold">Quantité</TableHead>
-                      <TableHead className="font-semibold">Prix unit.</TableHead>
+                      <TableHead className="font-semibold">
+                        Prix unit.
+                      </TableHead>
                       <TableHead className="font-semibold">Total</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
@@ -394,11 +434,17 @@ export default function AjouterCommandePage() {
                     {orderItems.map((item, index) => (
                       <TableRow
                         key={item.id}
-                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50/30"}
+                        className={
+                          index % 2 === 0
+                            ? "bg-white dark:bg-card"
+                            : "bg-gray-50/30 dark:bg-card"
+                        }
                       >
                         <TableCell>
                           <div className="py-2">
-                            <div className="font-medium text-gray-900">{item.nom}</div>
+                            <div className="font-medium text-gray-900">
+                              {item.nom}
+                            </div>
                             {(item.taille || item.couleur) && (
                               <div className="text-sm text-gray-500 mt-1">
                                 {item.taille && (
@@ -415,8 +461,10 @@ export default function AjouterCommandePage() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">{item.quantite}</TableCell>
-                        <TableCell className="text-gray-700">
+                        <TableCell className="font-medium">
+                          {item.quantite}
+                        </TableCell>
+                        <TableCell className="text-gray-700 dark:text-gray-100">
                           {formatPrice(item.prix)}
                         </TableCell>
                         <TableCell className="font-bold text-gray-900">
@@ -447,15 +495,19 @@ export default function AjouterCommandePage() {
             )}
 
             {/* Ajouter un produit */}
-            <div className="space-y-4 p-5 border-2 border-dashed border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div className="space-y-4 p-5 border-2 border-dashed border-gray-200 rounded-lg bg-white dark:bg-card">
               <div className="flex items-center gap-2">
                 <IconPlus className="h-5 w-5 text-blue-600" />
-                <h4 className="font-semibold text-gray-900">Ajouter un produit</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-white">
+                  Ajouter un produit
+                </h4>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Produit</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Produit
+                  </Label>
                   <Select
                     value={selectedProduct?.id || ""}
                     onValueChange={(value) => {
@@ -464,7 +516,7 @@ export default function AjouterCommandePage() {
                       setSelectedVariant(null);
                     }}
                   >
-                    <SelectTrigger className="h-10 bg-white">
+                    <SelectTrigger className="h-10 bg-white dark:bg-black">
                       <SelectValue placeholder="Sélectionner un produit" />
                     </SelectTrigger>
                     <SelectContent>
@@ -482,57 +534,65 @@ export default function AjouterCommandePage() {
                   </Select>
                 </div>
 
-                {selectedProduct && selectedProduct.variants.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">Variante</Label>
-                    <Select
-                      value={selectedVariant?.id || ""}
-                      onValueChange={(value) => {
-                        const variant = selectedProduct.variants.find((v) => v.id === value);
-                        setSelectedVariant(variant || null);
-                      }}
-                    >
-                      <SelectTrigger className="h-10 bg-white">
-                        <SelectValue placeholder="Sélectionner une variante" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedProduct.variants.map((variant) => (
-                          <SelectItem key={variant.id} value={variant.id}>
-                            <div className="flex justify-between items-center w-full">
-                              <span>
-                                {variant.taille && `${variant.taille}`}
-                                {variant.taille && variant.couleur && " • "}
-                                {variant.couleur && `${variant.couleur}`}
-                              </span>
-                              {variant.prix && (
-                                <span className="text-sm text-gray-500 ml-2">
-                                  {formatPrice(variant.prix)}
+                {selectedProduct &&
+                  selectedProduct.variants &&
+                  selectedProduct.variants.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Variante
+                      </Label>
+                      <Select
+                        value={selectedVariant?.id || ""}
+                        onValueChange={(value) => {
+                          const variant = selectedProduct.variants.find(
+                            (v) => v.id === value
+                          );
+                          setSelectedVariant(variant || null);
+                        }}
+                      >
+                        <SelectTrigger className="h-10 bg-white dark:bg-black">
+                          <SelectValue placeholder="Sélectionner une variante" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {selectedProduct.variants.map((variant) => (
+                            <SelectItem key={variant.id} value={variant.id}>
+                              <div className="flex justify-between items-center w-full">
+                                <span>
+                                  {variant.taille && `${variant.taille}`}
+                                  {variant.taille && variant.couleur && " • "}
+                                  {variant.couleur && `${variant.couleur}`}
                                 </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                                {variant.prix && (
+                                  <span className="text-sm text-gray-500 ml-2">
+                                    {formatPrice(variant.prix)}
+                                  </span>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
               </div>
 
               <div className="flex items-end gap-4">
                 <div className="flex-1 space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Quantité</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Quantité
+                  </Label>
                   <Input
                     type="number"
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="h-10 bg-white"
+                    className="h-10 bg-white dark:bg-black"
                   />
                 </div>
                 <Button
                   type="button"
                   onClick={handleAddProduct}
-                  className="flex items-center gap-2 px-6 h-10 bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                  className="flex items-center gap-2 px-6 h-10 bg-white cursor-pointer"
                   disabled={!selectedProduct}
                 >
                   <IconPlus className="h-4 w-4" />
@@ -542,15 +602,19 @@ export default function AjouterCommandePage() {
             </div>
 
             {/* Réduction */}
-            <div className="space-y-4 p-5 border rounded-lg bg-gradient-to-br from-green-50 to-emerald-50">
+            <div className="space-y-4 p-5 border rounded-lg bg-white dark:bg-card">
               <div className="flex items-center gap-2">
                 <IconPercentage className="h-5 w-5 text-green-600" />
-                <h4 className="font-semibold text-gray-900">Réduction</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-white">
+                  Réduction
+                </h4>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Type de réduction</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Type de réduction
+                  </Label>
                   <Select
                     value={discountType}
                     onValueChange={(value: "percentage" | "amount") => {
@@ -558,25 +622,29 @@ export default function AjouterCommandePage() {
                       setValue("discountType", value);
                     }}
                   >
-                    <SelectTrigger className="h-10 bg-white">
+                    <SelectTrigger className="h-10 bg-white dark:bg-black">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="percentage">Pourcentage (%)</SelectItem>
+                      <SelectItem value="percentage">
+                        Pourcentage (%)
+                      </SelectItem>
                       <SelectItem value="amount">Montant fixe (€)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Valeur de la réduction
                   </Label>
                   <Input
                     type="number"
                     min="0"
                     max={
-                      discountType === "percentage" ? "100" : calculateSubtotal().toString()
+                      discountType === "percentage"
+                        ? "100"
+                        : calculateSubtotal().toString()
                     }
                     step={discountType === "percentage" ? "1" : "0.01"}
                     value={discountValue}
@@ -586,7 +654,7 @@ export default function AjouterCommandePage() {
                       setValue("discountValue", value);
                     }}
                     placeholder={discountType === "percentage" ? "0" : "0.00"}
-                    className="h-10 bg-white"
+                    className="h-10 bg-white dark:bg-black"
                   />
                 </div>
               </div>
@@ -600,12 +668,14 @@ export default function AjouterCommandePage() {
             </div>
 
             {/* Total */}
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-5 rounded-lg border">
+            <div className="bg-white dark:bg-card p-5 rounded-lg border">
               <div className="space-y-3">
                 {/* Sous-total */}
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-600">Sous-total</span>
-                  <span className="text-lg font-semibold text-gray-800">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Sous-total
+                  </span>
+                  <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                     {formatPrice(calculateSubtotal())}
                   </span>
                 </div>
@@ -614,7 +684,10 @@ export default function AjouterCommandePage() {
                 {discountValue > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium text-green-600">
-                      Réduction {discountType === "percentage" ? `(${discountValue}%)` : ""}
+                      Réduction{" "}
+                      {discountType === "percentage"
+                        ? `(${discountValue}%)`
+                        : ""}
                     </span>
                     <span className="text-lg font-semibold text-green-600">
                       -{formatPrice(calculateDiscountAmount())}
@@ -627,7 +700,7 @@ export default function AjouterCommandePage() {
 
                 {/* Total final */}
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-700">
+                  <span className="text-lg font-semibold text-gray-700 dark:text-gray-200">
                     Total de la commande
                   </span>
                   <span className="text-2xl font-bold text-gray-900">
@@ -637,7 +710,8 @@ export default function AjouterCommandePage() {
 
                 {orderItems.length > 0 && (
                   <div className="text-sm text-gray-600">
-                    {orderItems.reduce((sum, item) => sum + item.quantite, 0)} articles au total
+                    {orderItems.reduce((sum, item) => sum + item.quantite, 0)}{" "}
+                    articles au total
                   </div>
                 )}
               </div>
@@ -662,14 +736,19 @@ export default function AjouterCommandePage() {
         {/* Actions */}
         <div className="flex items-center gap-3">
           <Link href="/dashboard/commandes">
-            <Button type="button" variant="outline" disabled={isLoading} className="flex-1 cursor-pointer">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isLoading}
+              className="flex-1 cursor-pointer"
+            >
               Annuler
             </Button>
           </Link>
           <Button
             type="submit"
             disabled={isLoading || orderItems.length === 0}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 cursor-pointer"
+            className="flex-1 bg-white cursor-pointer"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

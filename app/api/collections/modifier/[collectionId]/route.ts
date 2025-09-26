@@ -49,8 +49,7 @@ export async function DELETE(
 ) {
   try {
     const { collectionId } = await params;
-    
-    
+
     // Vérifier si la collection existe
     const existingCollection = await prisma.collection.findUnique({
       where: {
@@ -68,14 +67,12 @@ export async function DELETE(
       );
     }
 
-
     // Supprimer d'abord toutes les relations ProductCollection
     await prisma.productCollection.deleteMany({
       where: {
         collectionId: collectionId,
       },
     });
-
 
     // Ensuite supprimer la collection
     const deletedCollection = await prisma.collection.delete({
@@ -84,15 +81,20 @@ export async function DELETE(
       },
     });
 
-
     return NextResponse.json(
-      { message: "Collection supprimée avec succès", collection: deletedCollection },
+      {
+        message: "Collection supprimée avec succès",
+        collection: deletedCollection,
+      },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error deleting collection:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la suppression de la collection", details: error instanceof Error ? error.message : String(error) },
+      {
+        error: "Erreur lors de la suppression de la collection",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

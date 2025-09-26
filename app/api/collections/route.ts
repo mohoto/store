@@ -13,12 +13,18 @@ const collectionSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-
     const body = await req.json();
 
     const validatedData = collectionSchema.parse(body);
 
     const slug = createSlug(validatedData.nom);
+    /* console.log("body:", body);
+    console.log("validatedData:", validatedData);
+    console.log("slug:", slug);
+    return NextResponse.json(
+      { message: "Collection received", slug },
+      { status: 200 }
+    ); */
 
     const newCollection = await prisma.collection.create({
       data: {

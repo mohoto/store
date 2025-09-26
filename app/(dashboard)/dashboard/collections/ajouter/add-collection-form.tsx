@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import z from "zod";
 
 const collectionSchema = z.object({
@@ -25,6 +26,7 @@ const collectionSchema = z.object({
 
 export const AddCollectionForm = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(collectionSchema),
@@ -35,12 +37,12 @@ export const AddCollectionForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
+    setIsLoading(true);
 
     try {
       const collectionData = {
         ...values,
       };
-
 
       const response = await fetch("/api/collections", {
         method: "POST",
@@ -50,46 +52,42 @@ export const AddCollectionForm = () => {
         body: JSON.stringify(collectionData),
       });
 
-
-      // Récupérer le texte brut de la réponse d'abord
-      const responseText = await response.text();
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
-        // Essayer de parser le JSON seulement si on a une réponse
-        let newCollection = null;
-        if (responseText.trim()) {
-          try {
-            newCollection = JSON.parse(responseText);
-          } catch (parseError) {
-            console.warn(
-              "Could not parse success response as JSON:",
-              parseError
-            );
-          }
-        }
+        const responseText = await response.text();
+        console.log("Response text:", responseText);
 
-        router.refresh();
+        try {
+          const newCollection = JSON.parse(responseText);
+          console.log("Collection créée avec succès:", newCollection);
+
+          form.reset();
+          router.push("/dashboard/collections");
+        } catch (parseError) {
+          console.error("JSON parse error:", parseError);
+          console.error("Raw response:", responseText);
+        }
       } else {
-        // Essayer de parser l'erreur seulement si on a une réponse
-        let errorData = { error: "Erreur inconnue" };
-        if (responseText.trim()) {
-          try {
-            errorData = JSON.parse(responseText);
-          } catch (parseError) {
-            console.warn("Could not parse error response as JSON:", parseError);
-            errorData = { error: responseText || "Erreur lors de la création" };
-          }
+        const responseText = await response.text();
+        console.log("Error response text:", responseText);
+
+        let errorData;
+        try {
+          errorData = JSON.parse(responseText);
+        } catch (parseError) {
+          errorData = { error: responseText || "Erreur lors de la création" };
         }
 
         console.error("API Error:", errorData);
-        console.error(
-          "Erreur lors de la création:",
-          response.status,
-          errorData
-        );
+        console.error("Erreur lors de la création:", response.status, errorData);
       }
     } catch (error) {
       console.error("General error:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -127,11 +125,13 @@ export const AddCollectionForm = () => {
               />
             </div>
             <Button
+              type="submit"
               variant="ghost"
               size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear mt-20 cursor-pointer"
+              disabled={isLoading}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear mt-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Enregistrer
+              {isLoading ? "Enregistrement..." : "Enregistrer"}
             </Button>
           </form>
         </Form>

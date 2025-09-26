@@ -1,71 +1,60 @@
-"use client";
-
-import { SiteHeader } from "@app/(dashboard)/site-header";
+import { CollectionsTableSkeleton } from "@/components/dashboard/collections-table-skeleton";
 import { ProductsTable } from "@/components/dashboard/products-table";
+import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { TypeProduct } from "@/types/product";
-import { useEffect, useState } from "react";
+import { SiteHeader } from "@app/(dashboard)/site-header";
+import { Suspense } from "react";
 
-async function fetchProducts(): Promise<TypeProduct[]> {
-  const response = await fetch("/api/products");
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
+async function getProducts(): Promise<TypeProduct[]> {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        collections: {
+          include: {
+            collection: true,
+          },
+        },
+        variants: {
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return products;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des produits:", error);
+    throw new Error("Impossible de charger les produits");
   }
-  return response.json();
 }
 
-export default function Page() {
-  const [products, setProducts] = useState<TypeProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchProducts();
-      setProducts(data);
-    } catch (error) {
-      console.error("Error loading products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  if (loading) {
-    return (
-      <>
-        <SiteHeader
-          title="Produits"
-          buttonText="Ajouter un produit"
-          buttonUrl="/dashboard/produits/ajouter"
-        />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
-              <div className="text-center py-8">Chargement...</div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
-
+export default function PageWithSuspense() {
   return (
     <>
       <SiteHeader
         title="Produits"
         buttonText="Ajouter un produit"
-        buttonUrl="/dashboard/produits/ajouter"
+        buttonUrl="/dashboard/commandes/ajouter"
       />
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
-            <ProductsTable data={products} onDataChange={loadProducts} />
+          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+            <div className="px-4 lg:px-6">
+              <Suspense fallback={<CollectionsTableSkeleton />}>
+                <ProductsTableAsync />
+              </Suspense>
+            </div>
           </div>
         </div>
       </div>
     </>
   );
+}
+
+async function ProductsTableAsync() {
+  const products = await getProducts();
+  return <ProductsTable data={products} />;
 }

@@ -52,10 +52,10 @@ import { toast } from "sonner";
 
 interface ProductsTableProps {
   data: TypeProduct[];
-  onDataChange?: () => void;
+  //onDataChange?: () => void;
 }
 
-export function ProductsTable({ data, onDataChange }: ProductsTableProps) {
+export function ProductsTable({ data }: ProductsTableProps) {
   const products = data;
   const [selectedProducts, setSelectedProducts] = React.useState<Set<string>>(
     new Set()
@@ -227,7 +227,7 @@ export function ProductsTable({ data, onDataChange }: ProductsTableProps) {
         });
         setIsDeleteProductDialogOpen(false);
         setProductToDelete(null);
-        onDataChange?.();
+        //onDataChange?.();
         router.refresh();
       } else {
         let errorMessage = "Erreur lors de la suppression du produit";
@@ -315,7 +315,7 @@ export function ProductsTable({ data, onDataChange }: ProductsTableProps) {
         setIsAddCollectionDialogOpen(false);
         setSelectedCollectionToAdd("");
         setSelectedProducts(new Set());
-        onDataChange?.();
+        //onDataChange?.();
         router.refresh();
       } else {
         const error = await response.json();
@@ -359,7 +359,7 @@ export function ProductsTable({ data, onDataChange }: ProductsTableProps) {
           setIsRemoveCollectionDialogOpen(false);
           setSelectedCollectionToRemove("");
           setSelectedProducts(new Set());
-          onDataChange?.();
+          //onDataChange?.();
           router.refresh();
         } else {
           const error = await response.json();

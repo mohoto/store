@@ -36,6 +36,7 @@ export type TypeProduct = {
   prixReduit: number | null;
   images: string[];
   quantity: number | null;
+  actif: boolean;
   createdAt: Date;
   updatedAt: Date;
   variants: ProductVariant[];

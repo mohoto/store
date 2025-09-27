@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useImageUploadStore } from "@/store/ImageUploadStore";
 import { Collection } from "@/types/product";
@@ -57,6 +58,7 @@ const productSchema = z.object({
   description: z.string().optional(),
   prix: z.string(),
   prixReduit: z.string().optional(),
+  actif: z.boolean(),
   collections: z.array(z.string()),
   images: z.array(z.string()),
   variants: z.array(variantSchema).default([]),
@@ -89,8 +91,7 @@ export const AddProductForm = () => {
 
   // Hook UploadThing
   const { startUpload } = useUploadThing("imageUploader", {
-    onClientUploadComplete: () => {
-    },
+    onClientUploadComplete: () => {},
     onUploadError: (error: Error) => {
       console.error("Erreur upload:", error);
       alert(`Erreur: ${error.message}`);
@@ -138,8 +139,7 @@ export const AddProductForm = () => {
           const data = await response.json();
           setCollections(data);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     getColections();
   }, []);
@@ -151,6 +151,7 @@ export const AddProductForm = () => {
       description: "",
       prix: "",
       prixReduit: "",
+      actif: true,
       collections: [],
       images: [],
       variants: [],
@@ -268,7 +269,6 @@ export const AddProductForm = () => {
         images: finalImageUrls,
       };
 
-
       const response = await fetch("/api/produits", {
         method: "POST",
         headers: {
@@ -285,9 +285,11 @@ export const AddProductForm = () => {
 
         router.push("/dashboard/produits");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({
+          error: "Erreur lors de la création du produit"
+        }));
         console.error("Erreur lors de la création:", errorData);
-        alert("Erreur lors de la création du produit");
+        alert(`Erreur lors de la création du produit: ${errorData.error || errorData.details || 'Erreur inconnue'}`);
       }
     } catch (error) {
       console.error("Erreur:", error);
@@ -303,6 +305,29 @@ export const AddProductForm = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
+              <FormField
+                control={form.control}
+                name="actif"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Statut du produit</FormLabel>
+                      <div className="text-sm text-muted-foreground">
+                        {field.value ? "Produit actif" : "Produit inactif"}
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className={`scale-125 ${
+                          field.value ? "data-[state=checked]:bg-green-500" : ""
+                        }`}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="nom"
@@ -760,110 +785,110 @@ export const AddProductForm = () => {
             </Button>
           </form>
         </Form>
+      </CardContent>
+      {/* Modal pour ajouter une couleur personnalisée */}
+      <Dialog open={isColorModalOpen} onOpenChange={setIsColorModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Ajouter une couleur personnalisée</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Nom de la couleur</label>
+              <Input
+                placeholder="Ex: Bleu marine, Vert pomme..."
+                value={newColorName}
+                onChange={(e) => setNewColorName(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddCustomColor();
+                  }
+                }}
+              />
+            </div>
 
-        {/* Modal pour ajouter une couleur personnalisée */}
-        <Dialog open={isColorModalOpen} onOpenChange={setIsColorModalOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Ajouter une couleur personnalisée</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Nom de la couleur</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Couleur</label>
+              <div className="flex items-center gap-3">
+                <input
+                  id="colorPicker"
+                  type="color"
+                  value={newColorHex}
+                  onChange={(e) => setNewColorHex(e.target.value)}
+                  className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
+                />
                 <Input
-                  placeholder="Ex: Bleu marine, Vert pomme..."
-                  value={newColorName}
-                  onChange={(e) => setNewColorName(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAddCustomColor();
-                    }
-                  }}
+                  value={newColorHex}
+                  onChange={(e) => setNewColorHex(e.target.value)}
+                  placeholder="#FFFFFF"
+                  className="font-mono text-sm"
                 />
               </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Couleur</label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={newColorHex}
-                    onChange={(e) => setNewColorHex(e.target.value)}
-                    className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
-                  />
-                  <Input
-                    value={newColorHex}
-                    onChange={(e) => setNewColorHex(e.target.value)}
-                    placeholder="#FFFFFF"
-                    className="font-mono text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsColorModalOpen(false);
-                    setNewColorName("");
-                    setNewColorHex("#FFFFFF");
-                    setCurrentVariantIndex(null);
-                  }}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleAddCustomColor}
-                  disabled={!newColorName.trim()}
-                  className="gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Ajouter la couleur
-                </Button>
-              </div>
             </div>
-          </DialogContent>
-        </Dialog>
 
-        {/* Modal de confirmation de suppression de variante */}
-        <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Supprimer la variante</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <p className="text-sm text-gray-600">
-                Êtes-vous sûr de vouloir supprimer cette variante ? Cette action
-                est irréversible.
-              </p>
-            </div>
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  setIsDeleteModalOpen(false);
-                  setVariantToDelete(null);
+                  setIsColorModalOpen(false);
+                  setNewColorName("");
+                  setNewColorHex("#FFFFFF");
+                  setCurrentVariantIndex(null);
                 }}
               >
                 Annuler
               </Button>
               <Button
                 type="button"
-                variant="destructive"
-                onClick={handleDeleteVariant}
+                onClick={handleAddCustomColor}
+                disabled={!newColorName.trim()}
                 className="gap-2"
               >
-                <Trash2 className="h-4 w-4" />
-                Supprimer
+                <Plus className="h-4 w-4" />
+                Ajouter la couleur
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de confirmation de suppression de variante */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Supprimer la variante</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-600">
+              Êtes-vous sûr de vouloir supprimer cette variante ? Cette action
+              est irréversible.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setVariantToDelete(null);
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDeleteVariant}
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Supprimer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

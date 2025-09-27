@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Collection } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -32,6 +32,7 @@ export const EditCollectionForm = ({
   collection: Collection;
 }) => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(collectionSchema),
@@ -52,11 +53,9 @@ export const EditCollectionForm = ({
   }, [collection, form]);
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
-    try {
-      const collectionData = {
-        ...values,
-      };
+    setIsLoading(true);
 
+    try {
       const response = await fetch(
         `/api/collections/modifier/${collection.id}`,
         {
@@ -64,62 +63,26 @@ export const EditCollectionForm = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(collectionData),
+          body: JSON.stringify(values),
         }
       );
 
-
       if (response.ok) {
-        // Vérifier si la réponse contient du JSON
-        const contentType = response.headers.get("content-type");
-        let updatedCollection = null;
-
-        if (contentType && contentType.includes("application/json")) {
-          const responseText = await response.text();
-          if (responseText.trim()) {
-            try {
-              updatedCollection = JSON.parse(responseText);
-            } catch (parseError) {
-              console.warn("Failed to parse JSON response:", parseError);
-            }
-          }
-        }
-
-
         toast.success("Collection modifiée avec succès", {
           position: "top-center",
         });
-        router.refresh();
+        router.push("/dashboard/collections");
       } else {
-        // Gérer les erreurs de réponse
-        const contentType = response.headers.get("content-type");
-        let errorData = null;
-
-        if (contentType && contentType.includes("application/json")) {
-          const responseText = await response.text();
-          if (responseText.trim()) {
-            try {
-              errorData = JSON.parse(responseText);
-            } catch (parseError) {
-              console.warn("Failed to parse error JSON:", parseError);
-              errorData = { message: responseText };
-            }
-          }
-        } else {
-          errorData = { message: "Erreur du serveur" };
-        }
-
-        console.error("API Error:", errorData);
-        console.error(
-          "Erreur lors de la modification:",
-          response.status,
-          errorData
-        );
+        const errorData = await response.json().catch(() => ({
+          message: "Erreur lors de la modification"
+        }));
         toast.error(errorData?.message || "Erreur lors de la modification");
       }
     } catch (error) {
       console.error("General error:", error);
       toast.error("Erreur lors de la modification");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -158,11 +121,13 @@ export const EditCollectionForm = ({
             </div>
 
             <Button
+              type="submit"
               variant="ghost"
               size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear mt-20 cursor-pointer"
+              disabled={isLoading}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear mt-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Modifier
+              {isLoading ? "Modification..." : "Modifier"}
             </Button>
           </form>
         </Form>

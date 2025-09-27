@@ -141,6 +141,7 @@ model Product {
   prixReduit  Float?
   images      String[]
   quantity    Float?
+  actif       Boolean             @default(true)
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
   collections ProductCollection[]

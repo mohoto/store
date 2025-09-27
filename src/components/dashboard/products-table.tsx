@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -485,6 +486,7 @@ export function ProductsTable({ data }: ProductsTableProps) {
               </TableHead>
               <TableHead>Image</TableHead>
               <TableHead>Nom</TableHead>
+              <TableHead>Statut</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead className="text-right">Prix</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -493,7 +495,7 @@ export function ProductsTable({ data }: ProductsTableProps) {
           <TableBody>
             {paginatedProducts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={7} className="text-center py-8">
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-muted-foreground text-4xl">📦</span>
                     <p className="text-muted-foreground">
@@ -549,6 +551,20 @@ export function ProductsTable({ data }: ProductsTableProps) {
                     <TableCell>
                       <div className="font-medium max-w-[200px] truncate">
                         {product.nom}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={product.actif}
+                          disabled
+                          className={`scale-75 ${product.actif ? 'data-[state=checked]:bg-green-500' : ''}`}
+                        />
+                        <span className={`text-sm font-medium ${
+                          product.actif ? 'text-green-600' : 'text-gray-500'
+                        }`}>
+                          {product.actif ? 'Actif' : 'Inactif'}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>

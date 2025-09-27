@@ -137,90 +137,97 @@ export default function FeaturedProducts() {
           }}
         >
           <CarouselContent className="-ml-3 md:-ml-6">
-            {products.map((product: TypeProduct) => (
-              <CarouselItem
-                key={product.id}
-                className="pl-3 md:pl-6 basis-1/2 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-              >
-                <Link
-                  href={`/produits/${product.slug}`}
-                  className="block group"
+            {products
+              .filter((product: TypeProduct) => product.actif === true)
+              .map((product: TypeProduct) => (
+                <CarouselItem
+                  key={product.id}
+                  className="pl-3 md:pl-6 basis-1/2 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
-                  <div className="relative">
-                    {/* Product Image */}
-                    <div className="aspect-[4/5] overflow-hidden bg-gray-100 mb-3 relative border border-gray-200 group-hover:border-black transition-colors duration-300">
-                      {product.images &&
-                      product.images.length > 0 &&
-                      product.images[0] &&
-                      !isImageFailed(product.images[0]) ? (
-                        <Image
-                          src={product.images[0]}
-                          alt={product.nom}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          quality={75}
-                          onError={() => handleImageError(product.images[0])}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                          <span className="text-gray-400 text-sm font-light">
-                            {product.images[0] &&
-                            isImageFailed(product.images[0])
-                              ? "Image non disponible"
-                              : "Aucune image"}
-                          </span>
-                        </div>
-                      )}
-                      {/* Sale Badge */}
-                      {product.prixReduit && product.prixReduit > 0 && (
-                        <div className="absolute top-4 left-4 z-10">
-                          <span className="bg-black text-white px-3 py-1 text-xs font-medium">
-                            PROMO
-                          </span>
-                        </div>
-                      )}
-
-                      {/* New Badge */}
-                      {product.collections?.some(
-                        (pc) => pc.collection.nom.toLowerCase() === "nouveautés"
-                      ) && (
-                        <div
-                          className={`absolute top-4 z-10 ${product.prixReduit && product.prixReduit > 0 ? "right-4" : "left-4"}`}
-                        >
-                          <span className="bg-green-600 text-white px-3 py-1 text-xs font-medium">
-                            NOUVEAU
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="space-y-2">
-                      <h3 className="text-base font-medium text-black group-hover:text-gray-600 transition-colors duration-300">
-                        {product.nom}
-                      </h3>
-                      <div className="flex items-center space-x-2">
-                        {product.prixReduit && product.prixReduit > 0 ? (
-                          <>
-                            <span className="text-lg font-bold text-black">
-                              {product.prixReduit.toFixed(2)}€
-                            </span>
-                            <span className="text-sm text-gray-500 line-through font-light">
-                              {product.prix.toFixed(2)}€
-                            </span>
-                          </>
+                  <Link
+                    href={`/produits/${product.slug}`}
+                    className="block group"
+                  >
+                    <div className="relative">
+                      {/* Product Image */}
+                      <div className="aspect-[4/5] overflow-hidden bg-gray-100 mb-3 relative border border-gray-200 group-hover:border-black transition-colors duration-300">
+                        {product.images &&
+                        product.images.length > 0 &&
+                        product.images[0] &&
+                        !isImageFailed(product.images[0]) ? (
+                          <Image
+                            src={product.images[0]}
+                            alt={product.nom}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            quality={75}
+                            onError={() => handleImageError(product.images[0])}
+                          />
                         ) : (
-                          <span className="text-lg font-medium text-black">
-                            {product.prix.toFixed(2)}€
-                          </span>
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                            <span className="text-gray-400 text-sm font-light">
+                              {product.images[0] &&
+                              isImageFailed(product.images[0])
+                                ? "Image non disponible"
+                                : "Aucune image"}
+                            </span>
+                          </div>
+                        )}
+                        {/* Sale Badge */}
+                        {product.prixReduit && product.prixReduit > 0 && (
+                          <div className="absolute top-4 left-4 z-10">
+                            <span className="bg-black text-white px-3 py-1 text-xs font-medium">
+                              PROMO
+                            </span>
+                          </div>
+                        )}
+
+                        {/* New Badge */}
+                        {product.collections?.some(
+                          (pc) =>
+                            pc.collection.nom.toLowerCase() === "nouveautés"
+                        ) && (
+                          <div
+                            className={`absolute top-4 z-10 ${
+                              product.prixReduit && product.prixReduit > 0
+                                ? "right-4"
+                                : "left-4"
+                            }`}
+                          >
+                            <span className="bg-green-600 text-white px-3 py-1 text-xs font-medium">
+                              NOUVEAU
+                            </span>
+                          </div>
                         )}
                       </div>
+
+                      {/* Product Info */}
+                      <div className="space-y-2">
+                        <h3 className="text-base font-medium text-black group-hover:text-gray-600 transition-colors duration-300">
+                          {product.nom}
+                        </h3>
+                        <div className="flex items-center space-x-2">
+                          {product.prixReduit && product.prixReduit > 0 ? (
+                            <>
+                              <span className="text-lg font-bold text-black">
+                                {product.prixReduit.toFixed(2)}€
+                              </span>
+                              <span className="text-sm text-gray-500 line-through font-light">
+                                {product.prix.toFixed(2)}€
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-lg font-medium text-black">
+                              {product.prix.toFixed(2)}€
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </CarouselItem>
-            ))}
+                  </Link>
+                </CarouselItem>
+              ))}
           </CarouselContent>
         </Carousel>
       </div>

@@ -3,8 +3,6 @@ import UploadImagesDeferred from "@/components/dashboard/upload-images-deferred"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useImageUploadStore } from "@/store/ImageUploadStore";
-import { uploadFiles } from "@/utils/uploadthing";
 import {
   Dialog,
   DialogContent,
@@ -32,10 +30,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useImageUploadStore } from "@/store/ImageUploadStore";
 import { Collection, TypeProduct } from "@/types/product";
+import { uploadFiles } from "@/utils/uploadthing";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronDown, Plus, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -57,12 +59,14 @@ const productSchema = z.object({
   description: z.string().optional(),
   prix: z.string(),
   prixReduit: z.string().optional(),
+  actif: z.boolean(),
   collections: z.array(z.string()),
   images: z.array(z.string()),
   variants: z.array(variantSchema).default([]),
 });
 
 export const EditProductForm = ({ product }: { product: TypeProduct }) => {
+  const router = useRouter();
   const { pendingImages, clearPendingImages, resetAll } = useImageUploadStore();
 
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -124,8 +128,7 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
           const data = await response.json();
           setCollections(data);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     getColections();
   }, []);
@@ -137,6 +140,7 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
       description: "",
       prix: "",
       prixReduit: "",
+      actif: true,
       collections: [],
       images: [],
       variants: [],
@@ -148,12 +152,13 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
     if (product) {
       // Clean the store when starting to edit a product
       resetAll();
-      
+
       form.reset({
         nom: product.nom || "",
         description: product.description || "",
         prix: product.prix ? String(product.prix) : "",
         prixReduit: product.prixReduit ? String(product.prixReduit) : "",
+        actif: product.actif,
         collections: product.collections?.map((pc) => pc.collection.nom) || [],
         images: product.images || [],
         variants:
@@ -224,20 +229,18 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
   };
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
-    
     try {
       let imageUrls = values.images || [];
-      
+
       // Upload pending images if there are any
       if (pendingImages.length > 0) {
         try {
           const uploadedImages = await uploadFiles("imageUploader", {
-            files: pendingImages.map(img => img.file),
+            files: pendingImages.map((img) => img.file),
           });
-          
-          
+
           if (uploadedImages && uploadedImages.length > 0) {
-            const newImageUrls = uploadedImages.map(img => img.url);
+            const newImageUrls = uploadedImages.map((img) => img.url);
             // Add new uploaded images to existing ones
             imageUrls = [...imageUrls, ...newImageUrls];
             console.log("Images uploaded successfully:", newImageUrls);
@@ -269,21 +272,25 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
       if (response.ok) {
         const updatedProduct = await response.json();
         console.log("Produit modifié:", updatedProduct);
-        
+
         // Clear pending images after successful update
         clearPendingImages();
-        
+
         // Update the form with the new image URLs
         form.setValue("images", imageUrls);
-        
+
         toast.success("Produit modifié avec succès", {
           position: "top-center",
         });
-        //router.push("/dashboard/produits");
+        router.push("/dashboard/produits");
       } else {
         const errorData = await response.json();
         console.error("API Error:", errorData);
-        console.error("Erreur lors de la modification:", response.status, errorData);
+        console.error(
+          "Erreur lors de la modification:",
+          response.status,
+          errorData
+        );
         toast.error("Erreur lors de la modification");
       }
     } catch (error) {
@@ -298,6 +305,29 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
+              <FormField
+                control={form.control}
+                name="actif"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Statut du produit</FormLabel>
+                      <div className="text-sm text-muted-foreground">
+                        {field.value ? "Produit actif" : "Produit inactif"}
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className={`scale-125 ${
+                          field.value ? "data-[state=checked]:bg-green-500" : ""
+                        }`}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="nom"
@@ -737,6 +767,7 @@ export const EditProductForm = ({ product }: { product: TypeProduct }) => {
               )}
             />
             <Button
+              type="submit"
               variant="ghost"
               size="lg"
               className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear mt-20 cursor-pointer"

@@ -24,6 +24,7 @@ const productSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val ? parseFloat(val) : undefined)),
+  actif: z.boolean(),
   collections: z.array(z.string()),
   images: z.array(z.string()),
   variants: z.array(variantSchema).default([]),
@@ -50,6 +51,7 @@ export async function POST(req: NextRequest) {
         description: validatedData.description,
         prix: validatedData.prix,
         prixReduit: validatedData.prixReduit,
+        actif: validatedData.actif,
         images: validatedData.images,
         collections: {
           create: collections.map((collection: Collection) => ({

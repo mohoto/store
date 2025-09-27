@@ -39,7 +39,7 @@ export default function PageWithSuspense() {
       <SiteHeader
         title="Produits"
         buttonText="Ajouter un produit"
-        buttonUrl="/dashboard/commandes/ajouter"
+        buttonUrl="/dashboard/produits/ajouter"
       />
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">

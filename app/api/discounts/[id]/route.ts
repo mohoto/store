@@ -1,6 +1,7 @@
 import { nodePrisma as prisma } from "@/lib/prisma/node-client";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
+import type { Prisma } from "@/lib/generated/prisma";
 
 const updateDiscountSchema = z.object({
   code: z.string().min(3, "Le code doit contenir au moins 3 caractères").optional(),
@@ -62,7 +63,7 @@ export async function PATCH(
     }
 
     // Préparer les données pour la mise à jour
-    const updateData: any = {};
+    const updateData: Prisma.DiscountUpdateInput = {};
 
     if (validatedData.code !== undefined) updateData.code = validatedData.code;
     if (validatedData.description !== undefined) updateData.description = validatedData.description || null;

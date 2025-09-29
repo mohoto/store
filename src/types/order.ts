@@ -8,6 +8,26 @@ export type OrderStatus =
   | 'DELIVERED'   // Livrée
   | 'CANCELLED';  // Annulée
 
+export type DiscountType =
+  | 'PERCENTAGE'  // Pourcentage
+  | 'AMOUNT';     // Montant fixe
+
+export interface Discount {
+  id: string;
+  code: string;
+  description?: string | null;
+  type: DiscountType;
+  value: number;
+  minAmount?: number | null;
+  maxUses?: number | null;
+  usedCount: number;
+  isActive: boolean;
+  startsAt?: Date | null;
+  expiresAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface OrderItem {
   id: string;
   orderId: string;
@@ -36,6 +56,8 @@ export interface Order {
   subtotalAmount: number;      // Montant avant réduction
   discountType?: string | null; // "percentage" ou "amount"
   discountValue?: number | null; // Valeur de la réduction
+  discountId?: string | null;   // Référence au discount appliqué (optionnel)
+  discount?: Discount | null;   // Relation vers le discount
   discountAmount?: number | null; // Montant de la réduction calculée
   totalAmount: number;         // Montant final après réduction
   notes?: string | null;
@@ -56,6 +78,7 @@ export interface CreateOrderData {
   subtotalAmount: number;
   discountType?: string;
   discountValue?: number;
+  discountId?: string;
   discountAmount?: number;
   totalAmount: number;
   notes?: string;
@@ -86,9 +109,36 @@ export interface UpdateOrderData {
   subtotalAmount?: number;
   discountType?: string;
   discountValue?: number;
+  discountId?: string;
   discountAmount?: number;
   totalAmount?: number;
   notes?: string;
+}
+
+// Type pour la création d'un nouveau discount
+export interface CreateDiscountData {
+  code: string;
+  description?: string;
+  type: DiscountType;
+  value: number;
+  minAmount?: number;
+  maxUses?: number;
+  isActive?: boolean;
+  startsAt?: Date;
+  expiresAt?: Date;
+}
+
+// Type pour la mise à jour d'un discount
+export interface UpdateDiscountData {
+  code?: string;
+  description?: string;
+  type?: DiscountType;
+  value?: number;
+  minAmount?: number;
+  maxUses?: number;
+  isActive?: boolean;
+  startsAt?: Date;
+  expiresAt?: Date;
 }
 
 // Type pour les statistiques des commandes

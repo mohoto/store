@@ -1,56 +1,27 @@
 "use client";
 
-import { SiteConfig } from "@/lib/site-config";
+import { useHomePageConfig } from "@/hooks/useHomePageConfig";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import BannerFemme from "../../../../public/images/banniere.png";
-
-interface HeroConfig {
-  title: string;
-  subtitle: string;
-  image: string;
-  buttonText: string;
-}
 
 export default function Hero() {
-  const [config, setConfig] = useState<HeroConfig>({
-    title: "Ta personnalité mérite le meilleur style",
-    subtitle: "Nouvelle Collection",
-    image: BannerFemme.src,
-    buttonText: "Découvrir la collection",
-  });
+  const { config, isLoading } = useHomePageConfig();
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  const loadConfig = async () => {
-    try {
-      const response = await fetch("/api/site-config");
-      const configs = await response.json();
-
-      const configMap: Record<string, string> = {};
-      configs.forEach((c: SiteConfig) => {
-        configMap[c.key] = c.value;
-      });
-
-      setConfig({
-        title: configMap["homepage_hero_title"] || config.title,
-        subtitle: configMap["homepage_hero_subtitle"] || config.subtitle,
-        image: configMap["homepage_hero_image"] || config.image,
-        buttonText: configMap["homepage_hero_button_text"] || config.buttonText,
-      });
-    } catch (error) {
-      console.error("Erreur lors du chargement de la config hero:", error);
-    }
-  };
+  if (isLoading) {
+    return (
+      <section className="relative">
+        <div className="relative h-[600px] overflow-hidden bg-gray-200 animate-pulse">
+          {/* Skeleton loader */}
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="relative">
       <div className="relative h-[600px] overflow-hidden">
         {/* Background image with sophisticated overlay */}
         <div className="absolute inset-0">
           <Image
-            src={config.image}
+            src={config.homepage_hero_image}
             alt="Collection mode féminine exclusive"
             fill
             className="object-cover object-top-center"
@@ -75,14 +46,14 @@ export default function Hero() {
                 {/* Badge with enhanced styling */}
                 <div className="inline-flex items-center px-6 py-3 border border-white/30 backdrop-blur-sm bg-white/5">
                   <span className="text-white text-sm font-medium tracking-wide uppercase">
-                    {config.subtitle}
+                    {config.homepage_hero_subtitle}
                   </span>
                 </div>
 
                 {/* Main heading with better hierarchy */}
                 <div className="space-y-4">
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white leading-10 lg:leading-16">
-                    {config.title}
+                    {config.homepage_hero_title}
                   </h1>
                 </div>
 

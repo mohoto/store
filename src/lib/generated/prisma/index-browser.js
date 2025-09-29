@@ -250,9 +250,26 @@ exports.Prisma.OrderScalarFieldEnum = {
   subtotalAmount: 'subtotalAmount',
   discountType: 'discountType',
   discountValue: 'discountValue',
+  discountId: 'discountId',
   discountAmount: 'discountAmount',
   totalAmount: 'totalAmount',
   notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DiscountScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  type: 'type',
+  value: 'value',
+  minAmount: 'minAmount',
+  maxUses: 'maxUses',
+  usedCount: 'usedCount',
+  isActive: 'isActive',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -305,6 +322,11 @@ exports.OrderStatus = exports.$Enums.OrderStatus = {
   CANCELLED: 'CANCELLED'
 };
 
+exports.DiscountType = exports.$Enums.DiscountType = {
+  PERCENTAGE: 'PERCENTAGE',
+  AMOUNT: 'AMOUNT'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
@@ -318,6 +340,7 @@ exports.Prisma.ModelName = {
   ProductVariant: 'ProductVariant',
   ProductCollection: 'ProductCollection',
   Order: 'Order',
+  Discount: 'Discount',
   OrderItem: 'OrderItem',
   SiteConfig: 'SiteConfig'
 };

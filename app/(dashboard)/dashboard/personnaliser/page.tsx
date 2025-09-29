@@ -18,8 +18,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useImageUploadStore } from "@/store/ImageUploadStore";
+import { Discount } from "@/types/order";
 import { useUploadThing } from "@/utils/uploadthing";
 import { SiteHeader } from "@app/(dashboard)/site-header";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +38,10 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 // Schemas de validation pour chaque section
+const headerSchema = z.object({
+  announcement_message: z.string().optional(),
+  announcement_message_2: z.string().optional(),
+});
 const heroSchema = z.object({
   homepage_hero_image: z.string(),
   homepage_hero_title: z.string().min(1, "Le titre est requis"),
@@ -64,18 +77,27 @@ const categoriesSchema = z.object({
 });
 
 const promoSchema = z.object({
-  promo_section_image: z.string(),
   promo_section_title: z.string().min(1, "Le titre est requis"),
   promo_section_description: z.string().min(1, "La description est requise"),
 });
 
+const discountConfigSchema = z.object({
+  selected_discount_id: z.string().optional(),
+  promo_discount_enabled: z.boolean().default(false),
+  promo_discount_text: z.string().optional(),
+  promo_section_image: z.string(),
+});
+
+type HeaderFormData = z.infer<typeof headerSchema>;
 type HeroFormData = z.infer<typeof heroSchema>;
 type CategoriesFormData = z.infer<typeof categoriesSchema>;
 type PromoFormData = z.infer<typeof promoSchema>;
+type DiscountConfigFormData = z.infer<typeof discountConfigSchema>;
 
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
 
   // Store d'images différées
   const { pendingImages, clearPendingImages } = useImageUploadStore();
@@ -95,6 +117,15 @@ export default function Page() {
   });
 
   // Formulaires pour chaque section
+  const headerForm = useForm<HeaderFormData>({
+    resolver: zodResolver(headerSchema),
+    defaultValues: {
+      announcement_message: "Nouvelle collection disponible",
+      announcement_message_2:
+        "🔥 Profitez de nos codes de réduction sur tous nos produits !",
+    },
+  });
+
   const heroForm = useForm<HeroFormData>({
     resolver: zodResolver(heroSchema),
     defaultValues: {
@@ -137,12 +168,34 @@ export default function Page() {
   const promoForm = useForm<PromoFormData>({
     resolver: zodResolver(promoSchema),
     defaultValues: {
-      promo_section_image: "/images/promo-background.jpg",
       promo_section_title: "LIMITED OFFER",
       promo_section_description:
         "Des arrivages permanents pour tous les goûts.",
     },
   });
+
+  const discountConfigForm = useForm<DiscountConfigFormData>({
+    resolver: zodResolver(discountConfigSchema),
+    defaultValues: {
+      selected_discount_id: "",
+      promo_discount_enabled: false,
+      promo_discount_text: "Bénéficiez de votre réduction dès maintenant",
+      promo_section_image: "/images/promo-background.jpg",
+    },
+  });
+
+  const loadDiscounts = useCallback(async () => {
+    try {
+      const response = await fetch("/api/discounts");
+      const data = await response.json();
+      setDiscounts(data || []);
+    } catch (error) {
+      console.error("Erreur lors du chargement des réductions:", error);
+      toast.error("Erreur lors du chargement des réductions", {
+        position: "top-center",
+      });
+    }
+  }, []);
 
   const loadConfigurations = useCallback(async () => {
     try {
@@ -161,6 +214,14 @@ export default function Page() {
       });
 
       // Mettre à jour les formulaires avec les valeurs de la base
+      headerForm.reset({
+        announcement_message:
+          configMap["announcement_message"] || "Nouvelle collection disponible",
+        announcement_message_2:
+          configMap["announcement_message_2"] ||
+          "🔥 Profitez de nos codes de réduction sur tous nos produits !",
+      });
+
       heroForm.reset({
         homepage_hero_image:
           configMap["homepage_hero_image"] || "/images/banniere.png",
@@ -217,13 +278,21 @@ export default function Page() {
       });
 
       promoForm.reset({
-        promo_section_image:
-          configMap["promo_section_image"] || "/images/promo-background.jpg",
         promo_section_title:
           configMap["promo_section_title"] || "LIMITED OFFER",
         promo_section_description:
           configMap["promo_section_description"] ||
           "Des arrivages permanents pour tous les goûts.",
+      });
+
+      discountConfigForm.reset({
+        selected_discount_id: configMap["selected_discount_id"] || "",
+        promo_discount_enabled: configMap["promo_discount_enabled"] === "true",
+        promo_discount_text:
+          configMap["promo_discount_text"] ||
+          "Bénéficiez de votre réduction dès maintenant",
+        promo_section_image:
+          configMap["promo_section_image"] || "/images/promo-background.jpg",
       });
     } catch (error) {
       console.error("Erreur lors du chargement:", error);
@@ -237,10 +306,26 @@ export default function Page() {
 
   useEffect(() => {
     loadConfigurations();
-  }, [loadConfigurations]);
+    loadDiscounts();
+  }, [loadConfigurations, loadDiscounts]);
 
   const createDefaultConfigurations = async () => {
     const defaultConfigs = [
+      // Header Section
+      {
+        key: "announcement_message",
+        value: "Nouvelle collection disponible",
+        type: "text",
+        section: "header",
+        description: "Premier message d'annonce en haut de la page",
+      },
+      {
+        key: "announcement_message_2",
+        value: "🔥 Profitez de nos codes de réduction sur tous nos produits !",
+        type: "text",
+        section: "header",
+        description: "Deuxième message d'annonce en haut de la page",
+      },
       // Hero Section
       {
         key: "homepage_hero_image",
@@ -446,14 +531,37 @@ export default function Page() {
         value: "LIMITED OFFER",
         type: "text",
         section: "promo",
-        description: "Titre de la section promotionnelle",
+        description: "Titre de la section vidéo",
       },
       {
         key: "promo_section_description",
         value: "Des arrivages permanents pour tous les goûts.",
         type: "text",
         section: "promo",
-        description: "Description de la section promotionnelle",
+        description: "Description de la section vidéo",
+      },
+
+      // Discount Configuration
+      {
+        key: "selected_discount_id",
+        value: "",
+        type: "text",
+        section: "discount",
+        description: "ID de la réduction sélectionnée",
+      },
+      {
+        key: "promo_discount_enabled",
+        value: "false",
+        type: "text",
+        section: "discount",
+        description: "Activer l'affichage des réductions",
+      },
+      {
+        key: "promo_discount_text",
+        value: "Bénéficiez de votre réduction dès maintenant",
+        type: "text",
+        section: "discount",
+        description: "Texte d'accroche pour la réduction",
       },
     ];
 
@@ -677,8 +785,130 @@ export default function Page() {
     }
   };
 
+  const saveDiscountConfig = async (data: DiscountConfigFormData) => {
+    try {
+      setIsUploading(true);
+
+      console.log("Saving discount config:", data);
+
+      // Handle image uploads first
+      if (pendingImages.size > 0) {
+        const uploads = Array.from(pendingImages.entries()).map(([key, file]) =>
+          startUpload([file])
+        );
+        const uploadResults = await Promise.all(uploads);
+
+        // Update form with uploaded URLs
+        uploadResults.forEach((results, index) => {
+          if (results && results[0]) {
+            const key = Array.from(pendingImages.keys())[index];
+            if (key === "promo_image") {
+              discountConfigForm.setValue(
+                "promo_section_image",
+                results[0].url
+              );
+            }
+          }
+        });
+
+        clearPendingImages();
+      }
+
+      const promises = Object.entries(data).map(async ([key, value]) => {
+        const payload = {
+          key,
+          value: value?.toString(),
+          type: key === "promo_section_image" ? "image" : "text",
+          section: "discount",
+          description: getDescription(key),
+        };
+        console.log(`Saving ${key}:`, payload);
+
+        // Essayer PUT d'abord, puis POST si ça échoue
+        const putResponse = await fetch(`/api/site-config/${key}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!putResponse.ok) {
+          console.log(`PUT failed for ${key}, trying POST`);
+          // Si PUT échoue, essayer POST pour créer
+          return fetch(`/api/site-config`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+        }
+
+        return putResponse;
+      });
+
+      const results = await Promise.all(promises);
+
+      // Vérifier les réponses
+      for (const result of results) {
+        if (!result.ok) {
+          const errorText = await result.text();
+          console.error("Error response:", errorText);
+        }
+      }
+
+      toast.success("Configuration des réductions sauvegardée avec succès", {
+        position: "top-center",
+      });
+
+      // Recharger les configurations
+      await loadConfigurations();
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
+      toast.error("Erreur lors de la sauvegarde", {
+        position: "top-center",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const saveHeaderSection = async (data: HeaderFormData) => {
+    try {
+      setIsUploading(true);
+
+      const promises = Object.entries(data).map(([key, value]) =>
+        fetch(`/api/site-config/${key}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            value,
+            type: "text",
+            section: "header",
+            description: getDescription(key),
+          }),
+        })
+      );
+
+      await Promise.all(promises);
+
+      toast.success("Section Header sauvegardée avec succès", {
+        position: "top-center",
+      });
+
+      // Recharger les configurations
+      await loadConfigurations();
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
+      toast.error("Erreur lors de la sauvegarde", {
+        position: "top-center",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const getDescription = (key: string): string => {
     const descriptions: Record<string, string> = {
+      announcement_message: "Premier message d'annonce dans le header",
+      announcement_message_2: "Deuxième message d'annonce dans le header",
       homepage_hero_image: "Image principale de la page &#39;accueil",
       homepage_hero_title: "Titre principal de la page &#39;accueil",
       homepage_hero_subtitle: "Sous-titre de la page &#39;accueil",
@@ -706,8 +936,11 @@ export default function Page() {
       category_4_link: "Lien de la catégorie 4",
       category_4_image: "Image de la catégorie 4",
       promo_section_image: "Image de fond de la section promotionnelle",
-      promo_section_title: "Titre de la section promotionnelle",
-      promo_section_description: "Description de la section promotionnelle",
+      promo_section_title: "Titre de la section vidéo",
+      promo_section_description: "Description de la section vidéo",
+      selected_discount_id: "ID de la réduction sélectionnée",
+      promo_discount_enabled: "Activer l'affichage des réductions",
+      promo_discount_text: "Texte d'accroche pour la réduction",
     };
     return descriptions[key] || key;
   };
@@ -755,6 +988,66 @@ export default function Page() {
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-6 py-4 md:gap-8 md:py-6">
             <div className="px-4 lg:px-6 space-y-10">
+              {/* Section Header message */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Section Header</CardTitle>
+                  <CardDescription>
+                    Messages d'annonce qui défilent en haut de la page
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...headerForm}>
+                    <form
+                      onSubmit={headerForm.handleSubmit(saveHeaderSection)}
+                      className="space-y-6"
+                    >
+                      <FormField
+                        control={headerForm.control}
+                        name="announcement_message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Premier message d'annonce</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Nouvelle Collection"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={headerForm.control}
+                        name="announcement_message_2"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Deuxième message d'annonce</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Livraison gratuite à partir de 180€"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        className="w-full cursor-pointer"
+                        disabled={isUploading}
+                      >
+                        {isUploading
+                          ? "Upload et sauvegarde..."
+                          : "Sauvegarder la section Header"}
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
               {/* Section Hero */}
               <Card>
                 <CardHeader>
@@ -1030,12 +1323,12 @@ export default function Page() {
                 </CardContent>
               </Card>
 
-              {/* Section Promotion */}
+              {/* Section Vidéo */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Section Promotion</CardTitle>
+                  <CardTitle>Section Video</CardTitle>
                   <CardDescription>
-                    Configuration de la section promotionnelle
+                    Configuration de la section vidéo promotionnelle
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -1046,33 +1339,12 @@ export default function Page() {
                     >
                       <FormField
                         control={promoForm.control}
-                        name="promo_section_image"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <UploadSiteImageDeferred
-                                value={field.value}
-                                onChange={field.onChange}
-                                label="Image de fond de la section promotionnelle"
-                                description="Sélectionnez une image à uploader ou saisissez une URL directement"
-                                imageKey="promo_image"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={promoForm.control}
                         name="promo_section_title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>
-                              Titre de la section promotionnelle
-                            </FormLabel>
+                            <FormLabel>Titre de la section vidéo</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="LIMITED OFFER" />
+                              <Input {...field} placeholder="Titre" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1085,12 +1357,12 @@ export default function Page() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Description de la section promotionnelle
+                              Description de la section vidéo
                             </FormLabel>
                             <FormControl>
                               <Textarea
                                 {...field}
-                                placeholder="Des arrivages permanents pour tous les goûts."
+                                placeholder="Description"
                                 rows={3}
                               />
                             </FormControl>
@@ -1107,6 +1379,304 @@ export default function Page() {
                         {isUploading
                           ? "Upload et sauvegarde..."
                           : "Sauvegarder la section Promotion"}
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+
+              {/* Section Configuration des Réductions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Section Réductions</CardTitle>
+                  <CardDescription>
+                    Configuration de l'affichage des réductions avec timer dans
+                    la section promo
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...discountConfigForm}>
+                    <form
+                      onSubmit={discountConfigForm.handleSubmit(
+                        saveDiscountConfig
+                      )}
+                      className="space-y-6"
+                    >
+                      <FormField
+                        control={discountConfigForm.control}
+                        name="promo_discount_enabled"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">
+                                Afficher les réductions
+                              </FormLabel>
+                              <div className="text-sm text-muted-foreground">
+                                Active l'affichage du timer et du code de
+                                réduction dans la section promo
+                              </div>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+
+                      {discountConfigForm.watch("promo_discount_enabled") && (
+                        <>
+                          <FormField
+                            control={discountConfigForm.control}
+                            name="promo_section_image"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <UploadSiteImageDeferred
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    label="Image de fond de la section promotionnelle"
+                                    description="Sélectionnez une image à uploader ou saisissez une URL directement"
+                                    imageKey="promo_image"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={discountConfigForm.control}
+                            name="promo_discount_text"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  Texte d'accroche pour la réduction
+                                </FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    {...field}
+                                    placeholder="Bénéficiez de votre réduction dès maintenant"
+                                    rows={2}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={discountConfigForm.control}
+                            name="selected_discount_id"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  Réduction à afficher ({discounts.length}{" "}
+                                  disponible(s))
+                                </FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Sélectionner une réduction" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {discounts.length === 0 ? (
+                                      <SelectItem value="" disabled>
+                                        Aucune réduction disponible - Créez-en
+                                        une d'abord
+                                      </SelectItem>
+                                    ) : (
+                                      discounts.map((discount) => (
+                                        <SelectItem
+                                          key={discount.id}
+                                          value={discount.id}
+                                        >
+                                          <div className="flex flex-col">
+                                            <span className="font-medium">
+                                              {discount.code}
+                                            </span>
+                                            <span className="text-sm text-gray-500">
+                                              {discount.type === "PERCENTAGE"
+                                                ? `${discount.value}%`
+                                                : `${discount.value}€`}{" "}
+                                              -{" "}
+                                              {discount.isActive
+                                                ? "Active"
+                                                : "Inactive"}
+                                            </span>
+                                          </div>
+                                        </SelectItem>
+                                      ))
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                {field.value && (
+                                  <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    {(() => {
+                                      const selectedDiscount = discounts.find(
+                                        (d) => d.id === field.value
+                                      );
+                                      if (!selectedDiscount) return null;
+
+                                      return (
+                                        <div className="space-y-3">
+                                          <div className="flex items-center gap-2">
+                                            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                              Aperçu de la réduction
+                                              sélectionnée
+                                            </span>
+                                          </div>
+
+                                          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                            <div className="flex items-center justify-between mb-3">
+                                              <span className="font-mono bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 px-3 py-1.5 rounded-md text-sm font-semibold tracking-wider">
+                                                {selectedDiscount.code}
+                                              </span>
+                                              <div
+                                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                  selectedDiscount.isActive
+                                                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                                }`}
+                                              >
+                                                {selectedDiscount.isActive
+                                                  ? "Actif"
+                                                  : "Inactif"}
+                                              </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                              <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                                  <span className="text-gray-600 dark:text-gray-400">
+                                                    Réduction:
+                                                  </span>
+                                                  <span className="font-semibold text-blue-600 dark:text-blue-400">
+                                                    {selectedDiscount.type ===
+                                                    "PERCENTAGE"
+                                                      ? `${selectedDiscount.value}%`
+                                                      : `${selectedDiscount.value}€`}
+                                                  </span>
+                                                </div>
+
+                                                {selectedDiscount.minAmount && (
+                                                  <div className="flex items-center gap-2">
+                                                    <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                                    <span className="text-gray-600 dark:text-gray-400">
+                                                      Montant min:
+                                                    </span>
+                                                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                                                      {
+                                                        selectedDiscount.minAmount
+                                                      }
+                                                      €
+                                                    </span>
+                                                  </div>
+                                                )}
+
+                                                {selectedDiscount.maxUses && (
+                                                  <div className="flex items-center gap-2">
+                                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                                    <span className="text-gray-600 dark:text-gray-400">
+                                                      Utilisations max:
+                                                    </span>
+                                                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                                                      {selectedDiscount.maxUses}
+                                                    </span>
+                                                  </div>
+                                                )}
+                                              </div>
+
+                                              <div className="space-y-2">
+                                                {selectedDiscount.startsAt && (
+                                                  <div className="flex items-start gap-2">
+                                                    <span className="w-2 h-2 bg-green-500 rounded-full mt-1"></span>
+                                                    <div>
+                                                      <span className="text-gray-600 dark:text-gray-400 block text-xs">
+                                                        Début:
+                                                      </span>
+                                                      <span className="font-medium text-xs text-gray-900 dark:text-gray-100">
+                                                        {new Date(
+                                                          selectedDiscount.startsAt
+                                                        ).toLocaleString(
+                                                          "fr-FR",
+                                                          {
+                                                            day: "2-digit",
+                                                            month: "2-digit",
+                                                            year: "numeric",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                          }
+                                                        )}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                )}
+
+                                                {selectedDiscount.expiresAt && (
+                                                  <div className="flex items-start gap-2">
+                                                    <span className="w-2 h-2 bg-red-500 rounded-full mt-1"></span>
+                                                    <div>
+                                                      <span className="text-gray-600 dark:text-gray-400 block text-xs">
+                                                        Expiration:
+                                                      </span>
+                                                      <span className="font-medium text-xs text-gray-900 dark:text-gray-100">
+                                                        {new Date(
+                                                          selectedDiscount.expiresAt
+                                                        ).toLocaleString(
+                                                          "fr-FR",
+                                                          {
+                                                            day: "2-digit",
+                                                            month: "2-digit",
+                                                            year: "numeric",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                          }
+                                                        )}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </div>
+
+                                            {selectedDiscount.description && (
+                                              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                                                  "
+                                                  {selectedDiscount.description}
+                                                  "
+                                                </p>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+                                )}
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )}
+
+                      <Button
+                        type="submit"
+                        className="w-full cursor-pointer"
+                        disabled={isUploading}
+                      >
+                        {isUploading
+                          ? "Sauvegarde en cours..."
+                          : "Sauvegarder la configuration des réductions"}
                       </Button>
                     </form>
                   </Form>

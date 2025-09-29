@@ -53,3 +53,4 @@ This is a Next.js 15 dashboard application using the App Router with the followi
 - Custom Prisma client generation to `src/lib/generated/prisma`
 - Better Auth configuration in `src/lib/auth.ts`
 - Database connection utilities in `src/lib/prisma/`
+- @app/(dashboard)/dashboard/reductions/ajouter/add-discount-form.tsx Peux-tu ajouter le time picker pour la date de début et d'expiration

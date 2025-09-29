@@ -7,6 +7,7 @@ import {
   IconInnerShadowTop,
   IconPackage,
   IconPalette,
+  IconRosetteDiscount,
   IconSettings,
   IconShoppingCart,
   IconTag,
@@ -48,11 +49,11 @@ const data = {
       url: "/dashboard/collections",
       icon: IconTag,
     },
-    /* {
-      title: "Clients",
-      url: "/dashboard/clients",
-      icon: IconUsers,
-    }, */
+    {
+      title: "Réductions",
+      url: "/dashboard/reductions",
+      icon: IconRosetteDiscount,
+    },
   ],
   navClouds: [
     {

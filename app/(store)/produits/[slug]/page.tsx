@@ -1,4 +1,5 @@
 "use client";
+import { DiscountReminder } from "@/components/store/product/discount-reminder";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -147,7 +148,7 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Carousel d'images */}
           <div className="space-y-4">
@@ -561,6 +562,9 @@ export default function Page() {
                 </p>
               </div>
             )}
+
+            {/* Section rappel des réductions */}
+            <DiscountReminder />
           </div>
         </div>
       </div>

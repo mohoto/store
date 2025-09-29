@@ -54,6 +54,13 @@ function OrderConfirmationContent() {
   const [formCompleted, setFormCompleted] = useState(false);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    discountId: string;
+    discountCode: string;
+    discountType: string;
+    discountValue: number;
+    discountAmount: number;
+  } | null>(null);
 
   // Formulaire avec react-hook-form et zod
   const form = useForm<z.infer<typeof customerSchema>>({
@@ -80,9 +87,20 @@ function OrderConfirmationContent() {
     return searchParams.get("order") || generateOrderNumber();
   }, [searchParams]);
 
-  // Marquer comme monté côté client
+  // Marquer comme monté côté client et récupérer la réduction appliquée
   useEffect(() => {
     setIsMounted(true);
+
+    // Récupérer les informations de réduction depuis localStorage
+    const storedDiscount = localStorage.getItem('appliedDiscount');
+    if (storedDiscount) {
+      try {
+        const discountInfo = JSON.parse(storedDiscount);
+        setAppliedDiscount(discountInfo);
+      } catch (error) {
+        console.error('Erreur lors du parsing des informations de réduction:', error);
+      }
+    }
   }, []);
 
   // Vider le panier seulement lors de la sortie de la page (pas au rechargement)
@@ -116,6 +134,15 @@ function OrderConfirmationContent() {
 
   // Ne pas vider le panier automatiquement - attendre la sauvegarde réussie
 
+  // Calculer le total final avec réduction
+  const getFinalTotalPrice = () => {
+    const subtotal = getTotalPrice();
+    if (appliedDiscount) {
+      return subtotal - appliedDiscount.discountAmount;
+    }
+    return subtotal;
+  };
+
   // Fonction de soumission du formulaire
   const onSubmitCustomerInfo = async () => {
     setFormCompleted(true);
@@ -135,16 +162,27 @@ function OrderConfirmationContent() {
     const customerName = `${formValues.firstName} ${formValues.lastName}`;
     const fullAddress = `${formValues.street}\n${formValues.postalCode} ${formValues.city}\n${formValues.country}`;
 
-    return (
+    const subtotal = getTotalPrice();
+    const finalTotal = getFinalTotalPrice();
+
+    let message = (
       `*Nouvelle Commande*\n\n` +
       `*Numéro: ${orderNumber}\n\n` +
       `*Client: ${customerName}\n` +
       `*Téléphone: ${formValues.phone}\n` +
       `*Adresse:*\n${fullAddress}\n\n` +
       `*Articles commandés:\n${itemsList}\n\n` +
-      `*Total: ${getTotalPrice().toFixed(2)}€\n\n`
+      `*Sous-total: ${subtotal.toFixed(2)}€\n`
     );
-  }, [items, orderNumber, getTotalPrice, form]);
+
+    if (appliedDiscount) {
+      message += `*Réduction (${appliedDiscount.discountCode}): -${appliedDiscount.discountAmount.toFixed(2)}€\n`;
+    }
+
+    message += `*Total: ${finalTotal.toFixed(2)}€\n\n`;
+
+    return message;
+  }, [items, orderNumber, getTotalPrice, getFinalTotalPrice, appliedDiscount, form]);
 
   const handleWhatsAppClick = async () => {
     if (!formCompleted) {
@@ -161,7 +199,7 @@ function OrderConfirmationContent() {
       const customerName = `${formValues.firstName} ${formValues.lastName}`;
 
       // Sauvegarder la commande avec les informations client
-      const result = await createOrder(orderNumber, items, getTotalPrice(), {
+      const result = await createOrder(orderNumber, items, getFinalTotalPrice(), {
         name: customerName,
         phone: formValues.phone,
         street: formValues.street,
@@ -173,6 +211,10 @@ function OrderConfirmationContent() {
       if (result) {
         // Marquer la commande comme confirmée
         setOrderConfirmed(true);
+
+        // Nettoyer les informations de réduction
+        localStorage.removeItem('appliedDiscount');
+
         toast.success(
           "Commande sauvegardée avec succès ! Ouverture de WhatsApp...",
           {
@@ -315,10 +357,22 @@ function OrderConfirmationContent() {
                   </div>
                 ))}
 
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex justify-between items-center text-lg font-semibold">
-                    <span>Total:</span>
+                <div className="pt-4 border-t border-gray-200 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span>Sous-total:</span>
                     <span>{getTotalPrice().toFixed(2)}€</span>
+                  </div>
+
+                  {appliedDiscount && (
+                    <div className="flex justify-between items-center text-green-600">
+                      <span>Réduction ({appliedDiscount.discountCode}):</span>
+                      <span>-{appliedDiscount.discountAmount.toFixed(2)}€</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center text-lg font-semibold border-t pt-2">
+                    <span>Total:</span>
+                    <span>{getFinalTotalPrice().toFixed(2)}€</span>
                   </div>
                 </div>
               </div>

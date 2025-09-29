@@ -74,7 +74,9 @@ export function DiscountsTable({ data }: DiscountsTableProps) {
   const [discountToDelete, setDiscountToDelete] =
     React.useState<Discount | null>(null);
   const [isEditSheetOpen, setIsEditSheetOpen] = React.useState(false);
-  const [discountToEdit, setDiscountToEdit] = React.useState<Discount | null>(null);
+  const [discountToEdit, setDiscountToEdit] = React.useState<Discount | null>(
+    null
+  );
 
   // États pour les actions
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -567,9 +569,9 @@ export function DiscountsTable({ data }: DiscountsTableProps) {
           <DialogHeader>
             <DialogTitle>Supprimer la réduction</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer la réduction "
-              <span className="font-semibold">{discountToDelete?.code}</span>" ?
-              Cette action est irréversible.
+              Êtes-vous sûr de vouloir supprimer la réduction &#34;
+              <span className="font-semibold">{discountToDelete?.code}</span>
+              &#34; ? Cette action est irréversible.
             </DialogDescription>
           </DialogHeader>
 

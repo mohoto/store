@@ -157,8 +157,8 @@ export const DiscountReminder = () => {
           </h3>
         </div>
         <p className="text-xs sm:text-sm text-gray-700 font-medium px-2">
-          Profitez de nos réductions exceptionnelles avant qu'il ne soit trop
-          tard
+          Profitez de nos réductions exceptionnelles avant qu&#39;il ne soit
+          trop tard
         </p>
       </div>
 

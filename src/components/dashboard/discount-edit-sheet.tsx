@@ -2,8 +2,14 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -23,19 +29,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { Discount, DiscountType } from "@/types/order";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconCalendar, IconEdit, IconPercentage, IconTicket } from "@tabler/icons-react";
+import {
+  IconCalendar,
+  IconEdit,
+  IconPercentage,
+  IconTicket,
+} from "@tabler/icons-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 const discountSchema = z.object({
   code: z.string().min(3, "Le code doit contenir au moins 3 caractères"),
@@ -87,8 +92,14 @@ export function DiscountEditSheet({
       setValue("minAmount", discount.minAmount?.toString() || "");
       setValue("maxUses", discount.maxUses?.toString() || "");
       setValue("isActive", discount.isActive);
-      setValue("startsAt", discount.startsAt ? new Date(discount.startsAt) : undefined);
-      setValue("expiresAt", discount.expiresAt ? new Date(discount.expiresAt) : undefined);
+      setValue(
+        "startsAt",
+        discount.startsAt ? new Date(discount.startsAt) : undefined
+      );
+      setValue(
+        "expiresAt",
+        discount.expiresAt ? new Date(discount.expiresAt) : undefined
+      );
     }
   }, [discount, setValue]);
 
@@ -155,9 +166,13 @@ export function DiscountEditSheet({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
-          error: "Erreur lors de la mise à jour"
+          error: "Erreur lors de la mise à jour",
         }));
-        throw new Error(errorData.error || errorData.details || "Erreur lors de la mise à jour de la réduction");
+        throw new Error(
+          errorData.error ||
+            errorData.details ||
+            "Erreur lors de la mise à jour de la réduction"
+        );
       }
 
       const updatedDiscount = await response.json();
@@ -172,9 +187,14 @@ export function DiscountEditSheet({
 
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erreur lors de la mise à jour de la réduction", {
-        position: "top-center",
-      });
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la mise à jour de la réduction",
+        {
+          position: "top-center",
+        }
+      );
       console.error("Error updating discount:", error);
     } finally {
       setIsLoading(false);
@@ -198,11 +218,10 @@ export function DiscountEditSheet({
                 <IconEdit className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <div className="font-semibold">
-                  Réduction {discount.code}
-                </div>
+                <div className="font-semibold">Réduction {discount.code}</div>
                 <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Créée le {format(new Date(discount.createdAt), "PPP", { locale: fr })}
+                  Créée le{" "}
+                  {format(new Date(discount.createdAt), "PPP", { locale: fr })}
                 </div>
               </div>
             </SheetTitle>
@@ -250,7 +269,9 @@ export function DiscountEditSheet({
                       {...register("code")}
                       placeholder="ex: NOEL2024"
                       className="h-10"
-                      onChange={(e) => setValue("code", e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        setValue("code", e.target.value.toUpperCase())
+                      }
                     />
                     {errors.code && (
                       <p className="text-sm text-red-500 mt-1">
@@ -305,7 +326,9 @@ export function DiscountEditSheet({
                       htmlFor="value"
                       className="text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
-                      {watch("type") === "PERCENTAGE" ? "Pourcentage (%)" : "Montant (€)"}
+                      {watch("type") === "PERCENTAGE"
+                        ? "Pourcentage (%)"
+                        : "Montant (€)"}
                     </Label>
                     <Input
                       id="value"
@@ -314,7 +337,9 @@ export function DiscountEditSheet({
                       step={watch("type") === "PERCENTAGE" ? "1" : "0.01"}
                       min="0"
                       max={watch("type") === "PERCENTAGE" ? "100" : undefined}
-                      placeholder={watch("type") === "PERCENTAGE" ? "ex: 20" : "ex: 10.00"}
+                      placeholder={
+                        watch("type") === "PERCENTAGE" ? "ex: 20" : "ex: 10.00"
+                      }
                       className="h-10"
                     />
                     {errors.value && (
@@ -348,7 +373,7 @@ export function DiscountEditSheet({
                     htmlFor="maxUses"
                     className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Nombre d'utilisations maximum (optionnel)
+                    Nombre d&#39;utilisations maximum (optionnel)
                   </Label>
                   <Input
                     id="maxUses"
@@ -390,7 +415,9 @@ export function DiscountEditSheet({
                           )}
                         >
                           {watch("startsAt") ? (
-                            format(watch("startsAt")!, "PPP 'à' HH:mm", { locale: fr })
+                            format(watch("startsAt")!, "PPP 'à' HH:mm", {
+                              locale: fr,
+                            })
                           ) : (
                             <span>Sélectionner une date et heure</span>
                           )}
@@ -446,7 +473,8 @@ export function DiscountEditSheet({
                                 onChange={(e) => {
                                   const currentValue = watch("startsAt");
                                   if (currentValue) {
-                                    const [hours, minutes] = e.target.value.split(":");
+                                    const [hours, minutes] =
+                                      e.target.value.split(":");
                                     const newDate = new Date(currentValue);
                                     newDate.setHours(parseInt(hours));
                                     newDate.setMinutes(parseInt(minutes));
@@ -465,7 +493,7 @@ export function DiscountEditSheet({
                   {/* Date d'expiration */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Date d'expiration (optionnel)
+                      Date d&#39;expiration (optionnel)
                     </Label>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -477,7 +505,9 @@ export function DiscountEditSheet({
                           )}
                         >
                           {watch("expiresAt") ? (
-                            format(watch("expiresAt")!, "PPP 'à' HH:mm", { locale: fr })
+                            format(watch("expiresAt")!, "PPP 'à' HH:mm", {
+                              locale: fr,
+                            })
                           ) : (
                             <span>Sélectionner une date et heure</span>
                           )}
@@ -532,7 +562,8 @@ export function DiscountEditSheet({
                                 onChange={(e) => {
                                   const currentValue = watch("expiresAt");
                                   if (currentValue) {
-                                    const [hours, minutes] = e.target.value.split(":");
+                                    const [hours, minutes] =
+                                      e.target.value.split(":");
                                     const newDate = new Date(currentValue);
                                     newDate.setHours(parseInt(hours));
                                     newDate.setMinutes(parseInt(minutes));
@@ -556,13 +587,19 @@ export function DiscountEditSheet({
                       Statut
                     </Label>
                     <div className="text-sm text-muted-foreground">
-                      {watch("isActive") ? "Réduction active" : "Réduction inactive"}
+                      {watch("isActive")
+                        ? "Réduction active"
+                        : "Réduction inactive"}
                     </div>
                   </div>
                   <Switch
                     checked={watch("isActive")}
                     onCheckedChange={(checked) => setValue("isActive", checked)}
-                    className={`scale-125 ${watch("isActive") ? 'data-[state=checked]:bg-green-500' : ''}`}
+                    className={`scale-125 ${
+                      watch("isActive")
+                        ? "data-[state=checked]:bg-green-500"
+                        : ""
+                    }`}
                   />
                 </div>
               </div>
@@ -575,7 +612,7 @@ export function DiscountEditSheet({
                   <IconTicket className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  Statistiques d'utilisation
+                  Statistiques d&#39;utilisation
                 </h3>
               </div>
 
@@ -591,7 +628,9 @@ export function DiscountEditSheet({
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {discount.maxUses ? `${discount.maxUses - discount.usedCount}` : "∞"}
+                      {discount.maxUses
+                        ? `${discount.maxUses - discount.usedCount}`
+                        : "∞"}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Restantes
@@ -602,12 +641,22 @@ export function DiscountEditSheet({
                   <div className="mt-4">
                     <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                       <span>Progression</span>
-                      <span>{Math.round((discount.usedCount / discount.maxUses) * 100)}%</span>
+                      <span>
+                        {Math.round(
+                          (discount.usedCount / discount.maxUses) * 100
+                        )}
+                        %
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
                         className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min((discount.usedCount / discount.maxUses) * 100, 100)}%` }}
+                        style={{
+                          width: `${Math.min(
+                            (discount.usedCount / discount.maxUses) * 100,
+                            100
+                          )}%`,
+                        }}
                       ></div>
                     </div>
                   </div>

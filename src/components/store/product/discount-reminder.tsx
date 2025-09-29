@@ -147,7 +147,6 @@ export const DiscountReminder = () => {
   if (loading || activeDiscounts.length === 0) {
     return null;
   }
-
   return (
     <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-xl p-4 sm:p-6 shadow-sm">
       <div className="text-center mb-4">

@@ -174,7 +174,7 @@ export default function Page() {
     },
   });
 
-  const discountConfigForm = useForm<DiscountConfigFormData>({
+  const discountConfigForm = useForm({
     resolver: zodResolver(discountConfigSchema),
     defaultValues: {
       selected_discount_id: "",
@@ -792,17 +792,17 @@ export default function Page() {
       console.log("Saving discount config:", data);
 
       // Handle image uploads first
-      if (pendingImages.size > 0) {
-        const uploads = Array.from(pendingImages.entries()).map(([key, file]) =>
-          startUpload([file])
+      if (pendingImages.length > 0) {
+        const uploads = pendingImages.map((pendingImg) =>
+          startUpload([pendingImg.file])
         );
         const uploadResults = await Promise.all(uploads);
 
         // Update form with uploaded URLs
         uploadResults.forEach((results, index) => {
           if (results && results[0]) {
-            const key = Array.from(pendingImages.keys())[index];
-            if (key === "promo_image") {
+            const pendingImg = pendingImages[index];
+            if (pendingImg.id === "promo_image") {
               discountConfigForm.setValue(
                 "promo_section_image",
                 results[0].url
@@ -993,7 +993,7 @@ export default function Page() {
                 <CardHeader>
                   <CardTitle>Section Header</CardTitle>
                   <CardDescription>
-                    Messages d'annonce qui défilent en haut de la page
+                    Messages d&#39;annonce qui défilent en haut de la page
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -1007,7 +1007,7 @@ export default function Page() {
                         name="announcement_message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Premier message d'annonce</FormLabel>
+                            <FormLabel>Premier message d&#39;annonce</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
@@ -1024,7 +1024,9 @@ export default function Page() {
                         name="announcement_message_2"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Deuxième message d'annonce</FormLabel>
+                            <FormLabel>
+                              Deuxième message d&#39;annonce
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
@@ -1390,8 +1392,8 @@ export default function Page() {
                 <CardHeader>
                   <CardTitle>Section Réductions</CardTitle>
                   <CardDescription>
-                    Configuration de l'affichage des réductions avec timer dans
-                    la section promo
+                    Configuration de l&#39;affichage des réductions avec timer
+                    dans la section promo
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -1412,7 +1414,7 @@ export default function Page() {
                                 Afficher les réductions
                               </FormLabel>
                               <div className="text-sm text-muted-foreground">
-                                Active l'affichage du timer et du code de
+                                Active l&#39;affichage du timer et du code de
                                 réduction dans la section promo
                               </div>
                             </div>
@@ -1452,7 +1454,7 @@ export default function Page() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>
-                                  Texte d'accroche pour la réduction
+                                  Texte d&#39;accroche pour la réduction
                                 </FormLabel>
                                 <FormControl>
                                   <Textarea
@@ -1488,7 +1490,7 @@ export default function Page() {
                                     {discounts.length === 0 ? (
                                       <SelectItem value="" disabled>
                                         Aucune réduction disponible - Créez-en
-                                        une d'abord
+                                        une d&#39;abord
                                       </SelectItem>
                                     ) : (
                                       discounts.map((discount) => (
@@ -1651,9 +1653,7 @@ export default function Page() {
                                             {selectedDiscount.description && (
                                               <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                                                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                                                  "
                                                   {selectedDiscount.description}
-                                                  "
                                                 </p>
                                               </div>
                                             )}

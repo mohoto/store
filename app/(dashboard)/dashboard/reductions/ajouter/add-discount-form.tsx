@@ -258,7 +258,7 @@ export const AddDiscountForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Nombre d'utilisations maximum (optionnel)
+                    Nombre d&#39;utilisations maximum (optionnel)
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -377,7 +377,7 @@ export const AddDiscountForm = () => {
                 name="expiresAt"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Date d'expiration (optionnel)</FormLabel>
+                    <FormLabel>Date &#39;expiration (optionnel)</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>

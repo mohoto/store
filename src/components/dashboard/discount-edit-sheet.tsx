@@ -78,7 +78,7 @@ export function DiscountEditSheet({
     watch,
     reset,
     formState: { errors },
-  } = useForm<DiscountFormData>({
+  } = useForm({
     resolver: zodResolver(discountSchema),
   });
 

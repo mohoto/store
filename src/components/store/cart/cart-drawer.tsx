@@ -80,7 +80,7 @@ export const CartDrawer = () => {
           const now = new Date();
 
           // Filtrer les réductions actives et non expirées
-          const activeDiscounts = allDiscounts.filter(discount => {
+          const activeDiscounts = allDiscounts.filter((discount) => {
             if (!discount.isActive) return false;
 
             // Vérifier la date d'expiration
@@ -148,7 +148,7 @@ export const CartDrawer = () => {
     try {
       // Chercher le code dans les réductions actives
       const discount = activeDiscounts.find(
-        d => d.code.toUpperCase() === discountCode.toUpperCase()
+        (d) => d.code.toUpperCase() === discountCode.toUpperCase()
       );
 
       if (!discount) {
@@ -162,9 +162,14 @@ export const CartDrawer = () => {
 
       // Vérifier le montant minimum
       if (discount.minAmount && subtotal < discount.minAmount) {
-        toast.error(`Montant minimum de ${discount.minAmount.toFixed(2)}€ requis pour cette réduction`, {
-          position: "top-center",
-        });
+        toast.error(
+          `Montant minimum de ${discount.minAmount.toFixed(
+            2
+          )}€ requis pour cette réduction`,
+          {
+            position: "top-center",
+          }
+        );
         return;
       }
 
@@ -177,9 +182,12 @@ export const CartDrawer = () => {
           position: "top-center",
         });
       } else {
-        toast.error("Cette réduction ne peut pas être appliquée à votre commande", {
-          position: "top-center",
-        });
+        toast.error(
+          "Cette réduction ne peut pas être appliquée à votre commande",
+          {
+            position: "top-center",
+          }
+        );
       }
     } catch (error) {
       console.error("Erreur lors de l'application de la réduction:", error);
@@ -226,7 +234,7 @@ export const CartDrawer = () => {
           )}
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-full max-w-md ml-auto right-0 top-0 bottom-0 fixed z-50 rounded-l-lg">
+      <DrawerContent className="h-full w-full sm:max-w-md sm:ml-auto right-0 top-0 bottom-0 fixed z-50 sm:rounded-l-lg">
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">
             <div>
@@ -285,7 +293,7 @@ export const CartDrawer = () => {
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Quantité sur mobile - en dessous du prix */}
                     <div className="flex items-center justify-between mt-2 sm:hidden">
                       <div className="flex items-center gap-1">
@@ -310,12 +318,16 @@ export const CartDrawer = () => {
                           onClick={() =>
                             handleQuantityChange(item.id, "increment")
                           }
-                          disabled={item.maxQuantity ? item.quantite >= item.maxQuantity : false}
+                          disabled={
+                            item.maxQuantity
+                              ? item.quantite >= item.maxQuantity
+                              : false
+                          }
                         >
                           <IconPlus className="h-3 w-3" />
                         </Button>
                       </div>
-                      
+
                       <Button
                         variant="ghost"
                         size="icon"
@@ -360,7 +372,11 @@ export const CartDrawer = () => {
                         onClick={() =>
                           handleQuantityChange(item.id, "increment")
                         }
-                        disabled={item.maxQuantity ? item.quantite >= item.maxQuantity : false}
+                        disabled={
+                          item.maxQuantity
+                            ? item.quantite >= item.maxQuantity
+                            : false
+                        }
                       >
                         <IconPlus className="h-3 w-3" />
                       </Button>
@@ -379,7 +395,9 @@ export const CartDrawer = () => {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <IconTag className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">Code de réduction</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Code de réduction
+                  </span>
                 </div>
 
                 {appliedDiscount ? (
@@ -388,11 +406,15 @@ export const CartDrawer = () => {
                     <div className="flex items-center gap-2">
                       <IconCheck className="h-4 w-4 text-green-600" />
                       <div>
-                        <span className="text-sm font-medium text-green-800">{appliedDiscount.code}</span>
+                        <span className="text-sm font-medium text-green-800">
+                          {appliedDiscount.code}
+                        </span>
                         <p className="text-xs text-green-600">
                           {appliedDiscount.type === "PERCENTAGE"
                             ? `${appliedDiscount.value}% de réduction`
-                            : `${appliedDiscount.value.toFixed(2)}€ de réduction`}
+                            : `${appliedDiscount.value.toFixed(
+                                2
+                              )}€ de réduction`}
                         </p>
                       </div>
                     </div>
@@ -412,10 +434,12 @@ export const CartDrawer = () => {
                       <Input
                         placeholder="Code de réduction"
                         value={discountCode}
-                        onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                        onChange={(e) =>
+                          setDiscountCode(e.target.value.toUpperCase())
+                        }
                         className="flex-1"
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             applyDiscountCode();
                           }
                         }}
@@ -431,26 +455,39 @@ export const CartDrawer = () => {
                     </div>
 
                     {/* Message d'erreur pour montant minimum */}
-                    {discountCode && (() => {
-                      const discount = activeDiscounts.find(
-                        d => d.code.toUpperCase() === discountCode.toUpperCase()
-                      );
-                      const currentTotal = getTotalPrice();
-
-                      if (discount && discount.minAmount && currentTotal < discount.minAmount) {
-                        return (
-                          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
-                            <p>
-                              Montant minimum de <span className="font-medium">{discount.minAmount.toFixed(2)}€</span> requis pour ce code de réduction.
-                            </p>
-                            <p className="text-xs text-red-500 mt-1">
-                              Montant actuel: {currentTotal.toFixed(2)}€ (il manque {(discount.minAmount - currentTotal).toFixed(2)}€)
-                            </p>
-                          </div>
+                    {discountCode &&
+                      (() => {
+                        const discount = activeDiscounts.find(
+                          (d) =>
+                            d.code.toUpperCase() === discountCode.toUpperCase()
                         );
-                      }
-                      return null;
-                    })()}
+                        const currentTotal = getTotalPrice();
+
+                        if (
+                          discount &&
+                          discount.minAmount &&
+                          currentTotal < discount.minAmount
+                        ) {
+                          return (
+                            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                              <p>
+                                Montant minimum de{" "}
+                                <span className="font-medium">
+                                  {discount.minAmount.toFixed(2)}€
+                                </span>{" "}
+                                requis pour ce code de réduction.
+                              </p>
+                              <p className="text-xs text-red-500 mt-1">
+                                Montant actuel: {currentTotal.toFixed(2)}€ (il
+                                manque{" "}
+                                {(discount.minAmount - currentTotal).toFixed(2)}
+                                €)
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                   </div>
                 )}
               </div>
@@ -465,8 +502,12 @@ export const CartDrawer = () => {
 
               {appliedDiscount && discountAmount > 0 && (
                 <div className="flex justify-between items-center text-green-600">
-                  <span className="text-base">Réduction ({appliedDiscount.code}):</span>
-                  <span className="text-base">-{discountAmount.toFixed(2)}€</span>
+                  <span className="text-base">
+                    Réduction ({appliedDiscount.code}):
+                  </span>
+                  <span className="text-base">
+                    -{discountAmount.toFixed(2)}€
+                  </span>
                 </div>
               )}
 
@@ -486,13 +527,16 @@ export const CartDrawer = () => {
                   // TODO: Passer les informations de réduction à la page de confirmation
                   // Stocker les informations de la réduction pour la commande
                   if (appliedDiscount) {
-                    localStorage.setItem('appliedDiscount', JSON.stringify({
-                      discountId: appliedDiscount.id,
-                      discountCode: appliedDiscount.code,
-                      discountType: appliedDiscount.type,
-                      discountValue: appliedDiscount.value,
-                      discountAmount: discountAmount
-                    }));
+                    localStorage.setItem(
+                      "appliedDiscount",
+                      JSON.stringify({
+                        discountId: appliedDiscount.id,
+                        discountCode: appliedDiscount.code,
+                        discountType: appliedDiscount.type,
+                        discountValue: appliedDiscount.value,
+                        discountAmount: discountAmount,
+                      })
+                    );
                   }
 
                   router.push("/commande/confirmation");

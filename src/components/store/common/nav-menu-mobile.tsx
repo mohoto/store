@@ -11,6 +11,60 @@ import { IconMenuDeep, IconSquareX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 
+const menuFemme: { titre: string; link: string }[] = [
+  {
+    titre: "Manteaux/Vestes",
+    link: "/categories/femmes/vetements/manteaux-vestes",
+  },
+  {
+    titre: "Hauts/Top",
+    link: "/categories/femmes/vetements/hauts-top",
+  },
+  {
+    titre: "Pantalons",
+    link: "/categories/femmes/vetements/pantalons",
+  },
+  {
+    titre: "Ensembles",
+    link: "/categories/femmes/vetements/ensembles",
+  },
+  {
+    titre: "Chaussures",
+    link: "/categories/femmes/chaussures",
+  },
+  {
+    titre: "Accesoires",
+    link: "/categories/femmes/vetements/accessoires",
+  },
+];
+
+const menuHomme: { titre: string; link: string }[] = [
+  {
+    titre: "Manteaux/Vestes",
+    link: "/categories/hommes/vetements/manteaux-vestes",
+  },
+  {
+    titre: "Hauts/Top",
+    link: "/categories/hommes/vetements/hauts-top",
+  },
+  {
+    titre: "Pantalons",
+    link: "/categories/hommes/vetements/pantalons",
+  },
+  {
+    titre: "Ensembles",
+    link: "/categories/hommes/vetements/ensembles",
+  },
+  {
+    titre: "Chaussures",
+    link: "/categories/hommes/chaussures",
+  },
+  {
+    titre: "Accesoires",
+    link: "/categories/hommes/vetements/accessoires",
+  },
+];
+
 export const NavBarMobile = () => {
   const [openMenu, setOpenMenu] = useState<boolean>(false);
 
@@ -28,48 +82,69 @@ export const NavBarMobile = () => {
               </DrawerClose>
             </DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 flex flex-col text-lg gap-y-3">
+          <div className="px-4 pb-6 flex flex-col gap-y-4 h-full overflow-y-auto">
+            {/* Accueil */}
             <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
+              className="border-b border-gray-200 pb-3"
               onClick={() => setOpenMenu(false)}
             >
-              <Link href="/">Accueil</Link>
+              <Link
+                href="/"
+                className="text-lg font-semibold text-gray-900 hover:text-gray-600"
+              >
+                🏠 Accueil
+              </Link>
             </div>
-            <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
-              onClick={() => setOpenMenu(false)}
-            >
-              <Link href="/site-vitrine">Site vitrine</Link>
+
+            {/* Section Femme */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-gray-900 uppercase tracking-wide">
+                Pour Elle
+              </h3>
+              <ul className="space-y-2 pl-4">
+                {menuFemme.map((menu) => (
+                  <li key={menu.titre} onClick={() => setOpenMenu(false)}>
+                    <Link
+                      href={menu.link}
+                      className="text-base text-gray-700 hover:text-gray-900 hover:font-medium transition-colors block py-1"
+                    >
+                      {menu.titre}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
-              onClick={() => setOpenMenu(false)}
-            >
-              <Link href="/e-commerce">Site e-commerce</Link>
+
+            {/* Section Homme */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-gray-900 uppercase tracking-wide">
+                Pour Lui
+              </h3>
+              <ul className="space-y-2 pl-4">
+                {menuHomme.map((menu) => (
+                  <li key={menu.titre} onClick={() => setOpenMenu(false)}>
+                    <Link
+                      href={menu.link}
+                      className="text-base text-gray-700 hover:text-gray-900 hover:font-medium transition-colors block py-1"
+                    >
+                      {menu.titre}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
+
+            {/* Favoris */}
             <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
+              className="border-t border-gray-200 pt-3 mt-auto"
               onClick={() => setOpenMenu(false)}
             >
-              <Link href="/application-web">Application web</Link>
-            </div>
-            <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
-              onClick={() => setOpenMenu(false)}
-            >
-              <Link href="/tarifs">Tarifs</Link>
-            </div>
-            <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
-              onClick={() => setOpenMenu(false)}
-            >
-              <Link href="/contact">Nous contacter</Link>
-            </div>
-            <div
-              className="hover:bg-captive-primary focus:bg-captive-primary rounded-md p-2"
-              onClick={() => setOpenMenu(false)}
-            >
-              <Link href="/wishlist">Ma Wishlist</Link>
+              <Link
+                href="/wishlist"
+                className="text-lg font-semibold text-gray-900 hover:text-gray-600"
+              >
+                Mes favoris
+              </Link>
             </div>
           </div>
         </DrawerContent>

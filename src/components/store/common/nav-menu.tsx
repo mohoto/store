@@ -32,11 +32,11 @@ const menuFemme: { titre: string; link: string }[] = [
   },
   {
     titre: "Chaussures",
-    link: "/femmes/chaussures",
+    link: "/categories/femmes/chaussures",
   },
   {
     titre: "Accesoires",
-    link: "/categories/femmes/vetements/accesoires",
+    link: "/categories/femmes/vetements/accessoires",
   },
 ];
 
@@ -63,7 +63,7 @@ const menuHomme: { titre: string; link: string }[] = [
   },
   {
     titre: "Accesoires",
-    link: "/categories/hommes/vetements/accesoires",
+    link: "/categories/hommes/vetements/accessoires",
   },
 ];
 
@@ -101,7 +101,7 @@ export function NavMenu() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/wishlist">WISHLIST</Link>
+            <Link href="/wishlist">FAVORIS</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

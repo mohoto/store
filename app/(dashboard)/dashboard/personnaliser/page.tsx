@@ -1488,12 +1488,16 @@ export default function Page() {
                                   </FormControl>
                                   <SelectContent>
                                     {discounts.length === 0 ? (
-                                      <SelectItem value="" disabled>
+                                      <SelectItem value="no-discount" disabled>
                                         Aucune réduction disponible - Créez-en
                                         une d&#39;abord
                                       </SelectItem>
                                     ) : (
-                                      discounts.map((discount) => (
+                                      <>
+                                        <SelectItem value="none">
+                                          Aucune réduction sélectionnée
+                                        </SelectItem>
+                                        {discounts.map((discount) => (
                                         <SelectItem
                                           key={discount.id}
                                           value={discount.id}
@@ -1513,12 +1517,32 @@ export default function Page() {
                                             </span>
                                           </div>
                                         </SelectItem>
-                                      ))
+                                        ))}
+                                      </>
                                     )}
                                   </SelectContent>
                                 </Select>
                                 <FormMessage />
-                                {field.value && (
+
+                                {/* Bouton pour supprimer la sélection */}
+                                {field.value && field.value !== "none" && field.value !== "no-discount" && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      field.onChange("none");
+                                      toast.success("Sélection de réduction supprimée", {
+                                        position: "top-center",
+                                      });
+                                    }}
+                                    className="mt-2 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+                                  >
+                                    Supprimer la sélection
+                                  </Button>
+                                )}
+
+                                {field.value && field.value !== "none" && field.value !== "no-discount" && (
                                   <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
                                     {(() => {
                                       const selectedDiscount = discounts.find(

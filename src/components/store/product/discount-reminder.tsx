@@ -14,88 +14,86 @@ interface TimeRemaining {
 }
 
 export const DiscountReminder = () => {
-  const [activeDiscounts, setActiveDiscounts] = useState<Discount[]>([]);
+  const [selectedDiscount, setSelectedDiscount] = useState<Discount | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRemaining, setTimeRemaining] = useState<
-    Record<string, TimeRemaining>
-  >({});
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
 
   useEffect(() => {
-    const loadActiveDiscounts = async () => {
+    const loadSelectedDiscount = async () => {
       try {
-        const response = await fetch("/api/discounts");
-        if (response.ok) {
-          const allDiscounts: Discount[] = await response.json();
-          const now = new Date();
+        // Récupérer la configuration de la réduction sélectionnée
+        const configResponse = await fetch("/api/site-config/selected_discount_id");
+        if (!configResponse.ok) {
+          setLoading(false);
+          return;
+        }
 
-          // Filtrer les réductions actives et non expirées
-          const activeDiscounts = allDiscounts.filter((discount) => {
-            if (!discount.isActive) return false;
+        const configData = await configResponse.json();
+        const selectedDiscountId = configData.value;
 
-            // Vérifier la date d'expiration
-            if (discount.expiresAt && new Date(discount.expiresAt) < now) {
-              return false;
-            }
+        if (!selectedDiscountId || selectedDiscountId === "none" || selectedDiscountId === "no-discount") {
+          setLoading(false);
+          return;
+        }
 
-            // Vérifier la date de début
-            if (discount.startsAt && new Date(discount.startsAt) > now) {
-              return false;
-            }
+        // Récupérer la réduction spécifique
+        const discountResponse = await fetch(`/api/discounts/${selectedDiscountId}`);
+        if (!discountResponse.ok) {
+          setLoading(false);
+          return;
+        }
 
-            // Vérifier le nombre d'utilisations maximum
-            if (discount.maxUses && discount.usedCount >= discount.maxUses) {
-              return false;
-            }
+        const discount: Discount = await discountResponse.json();
+        const now = new Date();
 
-            return true;
-          });
+        // Vérifier si la réduction est valide
+        const isValid =
+          discount.isActive &&
+          (!discount.expiresAt || new Date(discount.expiresAt) > now) &&
+          (!discount.startsAt || new Date(discount.startsAt) <= now) &&
+          (!discount.maxUses || discount.usedCount < discount.maxUses);
 
-          setActiveDiscounts(activeDiscounts);
+        if (isValid) {
+          setSelectedDiscount(discount);
         }
       } catch (error) {
-        console.error("Erreur lors du chargement des réductions:", error);
+        console.error("Erreur lors du chargement de la réduction sélectionnée:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadActiveDiscounts();
+    loadSelectedDiscount();
   }, []);
 
   // Timer en temps réel
   useEffect(() => {
-    if (activeDiscounts.length === 0) return;
+    if (!selectedDiscount || !selectedDiscount.expiresAt) return;
 
     const updateTimer = () => {
-      const newTimeRemaining: Record<string, TimeRemaining> = {};
+      const now = new Date();
+      const expiry = new Date(selectedDiscount.expiresAt!);
+      const diff = expiry.getTime() - now.getTime();
 
-      activeDiscounts.forEach((discount) => {
-        if (discount.expiresAt) {
-          const now = new Date();
-          const expiry = new Date(discount.expiresAt);
-          const diff = expiry.getTime() - now.getTime();
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-          if (diff > 0) {
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor(
-              (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-            );
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            newTimeRemaining[discount.id] = { days, hours, minutes, seconds };
-          }
-        }
-      });
-
-      setTimeRemaining(newTimeRemaining);
+        setTimeRemaining({ days, hours, minutes, seconds });
+      } else {
+        setTimeRemaining(null);
+      }
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [activeDiscounts]);
+  }, [selectedDiscount]);
 
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
@@ -144,7 +142,7 @@ export const DiscountReminder = () => {
     </div>
   );
 
-  if (loading || activeDiscounts.length === 0) {
+  if (loading || !selectedDiscount) {
     return null;
   }
   return (
@@ -152,95 +150,76 @@ export const DiscountReminder = () => {
       <div className="text-center mb-4">
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="text-lg sm:text-xl font-bold text-black">
-            OFFRES LIMITÉES !
+            OFFRE LIMITÉE !
           </h3>
         </div>
         <p className="text-xs sm:text-sm text-gray-700 font-medium px-2">
-          Profitez de nos réductions exceptionnelles avant qu&#39;il ne soit
+          Profitez de cette réduction exceptionnelle avant qu&#39;il ne soit
           trop tard
         </p>
       </div>
 
       <div className="space-y-3 sm:space-y-4">
-        {activeDiscounts.slice(0, 2).map((discount) => {
-          const time = timeRemaining[discount.id];
-          return (
-            <div
-              key={discount.id}
-              className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-4 shadow-sm"
-            >
-              {/* Layout mobile : empilé, desktop : côte à côte */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-3">
-                {/* Ligne 1 : Code + Bouton copy */}
-                <div className="flex items-center justify-between sm:justify-start gap-3">
-                  <div className="flex items-center gap-2">
-                    <IconTag className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
-                    <span className="font-mono font-bold text-base sm:text-lg text-white bg-black px-2 sm:px-3 py-1 rounded-lg">
-                      {discount.code}
-                    </span>
-                  </div>
-                  <Button
-                    variant={
-                      copiedCode === discount.code ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => copyToClipboard(discount.code)}
-                    className={`h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm transition-all duration-200 ${
-                      copiedCode === discount.code
-                        ? "bg-green-600 text-white border-green-600 hover:bg-green-700 scale-95"
-                        : "text-black hover:bg-gray-100 border-gray-300 hover:scale-105 active:scale-95"
-                    }`}
-                    disabled={copiedCode === discount.code}
-                  >
-                    {copiedCode === discount.code ? "✓ Copié" : "Copier"}
-                  </Button>
-                </div>
-
-                {/* Ligne 2 : Réduction + Badge */}
-                <div className="text-left sm:text-right">
-                  <div className="text-base sm:text-lg font-bold text-black">
-                    {discount.type === "PERCENTAGE"
-                      ? `${discount.value}% DE RÉDUCTION`
-                      : `${discount.value.toFixed(2)}€ DE RÉDUCTION`}
-                  </div>
-                  {discount.minAmount && (
-                    <Badge
-                      variant="outline"
-                      className="text-xs border-gray-300 text-gray-700 mt-1"
-                    >
-                      Min. {discount.minAmount.toFixed(2)}€
-                    </Badge>
-                  )}
-                </div>
+        <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-4 shadow-sm">
+          {/* Layout mobile : empilé, desktop : côte à côte */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-3">
+            {/* Ligne 1 : Code + Bouton copy */}
+            <div className="flex items-center justify-between sm:justify-start gap-3">
+              <div className="flex items-center gap-2">
+                <IconTag className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
+                <span className="font-mono font-bold text-base sm:text-lg text-white bg-black px-2 sm:px-3 py-1 rounded-lg">
+                  {selectedDiscount.code}
+                </span>
               </div>
+              <Button
+                variant={
+                  copiedCode === selectedDiscount.code ? "default" : "outline"
+                }
+                size="sm"
+                onClick={() => copyToClipboard(selectedDiscount.code)}
+                className={`h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm transition-all duration-200 ${
+                  copiedCode === selectedDiscount.code
+                    ? "bg-green-600 text-white border-green-600 hover:bg-green-700 scale-95"
+                    : "text-black hover:bg-gray-100 border-gray-300 hover:scale-105 active:scale-95"
+                }`}
+                disabled={copiedCode === selectedDiscount.code}
+              >
+                {copiedCode === selectedDiscount.code ? "✓ Copié" : "Copier"}
+              </Button>
+            </div>
 
-              {/* Timer */}
-              {time && (
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <IconClock className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
-                    <span className="text-xs sm:text-sm font-medium text-black">
-                      Temps restant :
-                    </span>
-                  </div>
-                  <TimeDisplay time={time} />
-                </div>
+            {/* Ligne 2 : Réduction + Badge */}
+            <div className="text-left sm:text-right">
+              <div className="text-base sm:text-lg font-bold text-black">
+                {selectedDiscount.type === "PERCENTAGE"
+                  ? `${selectedDiscount.value}% DE RÉDUCTION`
+                  : `${selectedDiscount.value.toFixed(2)}€ DE RÉDUCTION`}
+              </div>
+              {selectedDiscount.minAmount && (
+                <Badge
+                  variant="outline"
+                  className="text-xs border-gray-300 text-gray-700 mt-1"
+                >
+                  Min. {selectedDiscount.minAmount.toFixed(2)}€
+                </Badge>
               )}
             </div>
-          );
-        })}
-      </div>
+          </div>
 
-      {activeDiscounts.length > 2 && (
-        <div className="text-center mt-4 p-3 bg-gray-200 rounded-lg">
-          <p className="text-xs sm:text-sm text-black font-medium">
-            🔥 Et {activeDiscounts.length - 2} autre
-            {activeDiscounts.length - 2 > 1 ? "s" : ""} réduction
-            {activeDiscounts.length - 2 > 1 ? "s" : ""} disponible
-            {activeDiscounts.length - 2 > 1 ? "s" : ""} !
-          </p>
+          {/* Timer */}
+          {timeRemaining && (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <IconClock className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
+                <span className="text-xs sm:text-sm font-medium text-black">
+                  Temps restant :
+                </span>
+              </div>
+              <TimeDisplay time={timeRemaining} />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

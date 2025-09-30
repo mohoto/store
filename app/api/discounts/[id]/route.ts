@@ -3,6 +3,38 @@ import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 import type { Prisma } from "@/lib/generated/prisma";
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const discount = await prisma.discount.findUnique({
+      where: { id },
+    });
+
+    if (!discount) {
+      return NextResponse.json(
+        { error: "Réduction non trouvée" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(discount, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching discount:", error);
+
+    return NextResponse.json(
+      {
+        error: "Erreur lors de la récupération de la réduction",
+        details: error instanceof Error ? error.message : "Erreur inconnue"
+      },
+      { status: 500 }
+    );
+  }
+}
+
 const updateDiscountSchema = z.object({
   code: z.string().min(3, "Le code doit contenir au moins 3 caractères").optional(),
   description: z.string().optional(),

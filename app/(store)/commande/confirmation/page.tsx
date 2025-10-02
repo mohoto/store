@@ -242,7 +242,7 @@ function OrderConfirmationContent() {
         const message = encodeURIComponent(formatOrderMessage());
 
         // Générer le message et ouvrir WhatsApp
-        const phoneNumber = "+33774037899";
+        const phoneNumber = "+33757837110";
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
 
         // Attendre un peu pour que l'utilisateur voie le toast puis ouvrir WhatsApp
@@ -732,18 +732,29 @@ function OrderConfirmationContent() {
               </Button>
 
               {/* Lien direct WhatsApp en backup si le bouton ne marche pas */}
-              {formCompleted && !isSavingOrder && (
+              {formCompleted && (
                 <div className="text-center mt-2">
                   <p className="text-sm text-gray-600 mb-2">
                     Si le bouton ne fonctionne pas, cliquez sur ce lien :
                   </p>
                   <a
-                    href={`https://wa.me/+33774037899?text=${encodeURIComponent(formatOrderMessage())}`}
+                    href={`https://wa.me/+33757837110?text=${encodeURIComponent(
+                      formatOrderMessage()
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-green-600 underline text-sm font-medium"
+                    className="text-green-600 underline text-sm font-medium hover:text-green-800"
+                    onClick={(e) => {
+                      // Empêcher le lien de s'ouvrir si on est en train de sauvegarder
+                      if (isSavingOrder) {
+                        e.preventDefault();
+                        return;
+                      }
+                      // Optionnel : sauvegarder la commande quand on clique sur le lien backup
+                      handleWhatsAppClick();
+                    }}
                   >
-                    Ouvrir WhatsApp directement
+                    📱 Ouvrir WhatsApp directement
                   </a>
                 </div>
               )}

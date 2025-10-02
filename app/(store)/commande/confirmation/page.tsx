@@ -229,7 +229,17 @@ function OrderConfirmationContent() {
         setTimeout(() => {
           const phoneNumber = "+33774037899";
           const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-          window.open(whatsappUrl, "_blank");
+
+          // Détecter si c'est un mobile pour utiliser la bonne méthode d'ouverture
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+          if (isMobile) {
+            // Sur mobile, rediriger directement pour ouvrir l'app WhatsApp
+            window.location.href = whatsappUrl;
+          } else {
+            // Sur desktop, ouvrir dans un nouvel onglet
+            window.open(whatsappUrl, "_blank");
+          }
         }, 1500);
       } else {
         toast.error("Erreur lors de la sauvegarde de la commande", {

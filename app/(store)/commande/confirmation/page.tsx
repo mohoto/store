@@ -92,13 +92,16 @@ function OrderConfirmationContent() {
     setIsMounted(true);
 
     // Récupérer les informations de réduction depuis localStorage
-    const storedDiscount = localStorage.getItem('appliedDiscount');
+    const storedDiscount = localStorage.getItem("appliedDiscount");
     if (storedDiscount) {
       try {
         const discountInfo = JSON.parse(storedDiscount);
         setAppliedDiscount(discountInfo);
       } catch (error) {
-        console.error('Erreur lors du parsing des informations de réduction:', error);
+        console.error(
+          "Erreur lors du parsing des informations de réduction:",
+          error
+        );
       }
     }
   }, []);
@@ -165,24 +168,32 @@ function OrderConfirmationContent() {
     const subtotal = getTotalPrice();
     const finalTotal = getFinalTotalPrice();
 
-    let message = (
+    let message =
       `*Nouvelle Commande*\n\n` +
       `*Numéro: ${orderNumber}\n\n` +
       `*Client: ${customerName}\n` +
       `*Téléphone: ${formValues.phone}\n` +
       `*Adresse:*\n${fullAddress}\n\n` +
       `*Articles commandés:\n${itemsList}\n\n` +
-      `*Sous-total: ${subtotal.toFixed(2)}€\n`
-    );
+      `*Sous-total: ${subtotal.toFixed(2)}€\n`;
 
     if (appliedDiscount) {
-      message += `*Réduction (${appliedDiscount.discountCode}): -${appliedDiscount.discountAmount.toFixed(2)}€\n`;
+      message += `*Réduction (${
+        appliedDiscount.discountCode
+      }): -${appliedDiscount.discountAmount.toFixed(2)}€\n`;
     }
 
     message += `*Total: ${finalTotal.toFixed(2)}€\n\n`;
 
     return message;
-  }, [items, orderNumber, getTotalPrice, getFinalTotalPrice, appliedDiscount, form]);
+  }, [
+    items,
+    orderNumber,
+    getTotalPrice,
+    getFinalTotalPrice,
+    appliedDiscount,
+    form,
+  ]);
 
   const handleWhatsAppClick = async () => {
     if (!formCompleted) {
@@ -199,21 +210,26 @@ function OrderConfirmationContent() {
       const customerName = `${formValues.firstName} ${formValues.lastName}`;
 
       // Sauvegarder la commande avec les informations client
-      const result = await createOrder(orderNumber, items, getFinalTotalPrice(), {
-        name: customerName,
-        phone: formValues.phone,
-        street: formValues.street,
-        postalCode: formValues.postalCode,
-        city: formValues.city,
-        country: formValues.country,
-      });
+      const result = await createOrder(
+        orderNumber,
+        items,
+        getFinalTotalPrice(),
+        {
+          name: customerName,
+          phone: formValues.phone,
+          street: formValues.street,
+          postalCode: formValues.postalCode,
+          city: formValues.city,
+          country: formValues.country,
+        }
+      );
 
       if (result) {
         // Marquer la commande comme confirmée
         setOrderConfirmed(true);
 
         // Nettoyer les informations de réduction
-        localStorage.removeItem('appliedDiscount');
+        localStorage.removeItem("appliedDiscount");
 
         toast.success(
           "Commande sauvegardée avec succès ! Ouverture de WhatsApp...",
@@ -225,22 +241,15 @@ function OrderConfirmationContent() {
         // Générer le message AVANT de vider le panier
         const message = encodeURIComponent(formatOrderMessage());
 
-        // Attendre un peu pour que l'utilisateur voie le toast
+        // Générer le message et ouvrir WhatsApp
+        const phoneNumber = "+33774037899";
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+        // Attendre un peu pour que l'utilisateur voie le toast puis ouvrir WhatsApp
         setTimeout(() => {
-          const phoneNumber = "+33774037899";
-          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-
-          // Détecter si c'est un mobile pour utiliser la bonne méthode d'ouverture
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-          if (isMobile) {
-            // Sur mobile, rediriger directement pour ouvrir l'app WhatsApp
-            window.location.href = whatsappUrl;
-          } else {
-            // Sur desktop, ouvrir dans un nouvel onglet
-            window.open(whatsappUrl, "_blank");
-          }
-        }, 1500);
+          // Méthode simple et directe qui marche mieux sur mobile
+          window.location.assign(whatsappUrl);
+        }, 1000);
       } else {
         toast.error("Erreur lors de la sauvegarde de la commande", {
           position: "top-center",
@@ -292,7 +301,7 @@ function OrderConfirmationContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto px-1 sm:px-4 lg:px-8">
         {/* En-tête de confirmation */}
         <div className="text-center mb-8">
           <div
@@ -721,6 +730,23 @@ function OrderConfirmationContent() {
                   ? "Finaliser avec WhatsApp"
                   : "Complétez vos informations d'abord"}
               </Button>
+
+              {/* Lien direct WhatsApp en backup si le bouton ne marche pas */}
+              {formCompleted && !isSavingOrder && (
+                <div className="text-center mt-2">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Si le bouton ne fonctionne pas, cliquez sur ce lien :
+                  </p>
+                  <a
+                    href={`https://wa.me/+33774037899?text=${encodeURIComponent(formatOrderMessage())}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-600 underline text-sm font-medium"
+                  >
+                    Ouvrir WhatsApp directement
+                  </a>
+                </div>
+              )}
 
               {/* <div className="grid grid-cols-2 gap-3">
                 <Button

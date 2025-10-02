@@ -58,7 +58,7 @@ export default function WishlistPage() {
               <IconHeart className="mx-auto h-24 w-24 text-gray-300" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Votre wishlist est vide
+              Votre liste de favoris est vide
             </h1>
             <p className="text-lg text-gray-600 mb-8">
               Découvrez nos produits et ajoutez-les à votre wishlist
@@ -144,7 +144,9 @@ export default function WishlistPage() {
                   (collection) => collection.toLowerCase() === "nouveautés"
                 ) && (
                   <div
-                    className={`absolute top-3 z-10 ${item.prixReduit ? "right-3" : "left-3"}`}
+                    className={`absolute top-3 z-10 ${
+                      item.prixReduit ? "right-3" : "left-3"
+                    }`}
                   >
                     <span className="bg-green-600 text-white px-2 py-1 text-xs font-medium rounded">
                       NOUVEAU

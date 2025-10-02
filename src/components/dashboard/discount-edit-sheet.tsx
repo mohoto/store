@@ -207,7 +207,7 @@ export function DiscountEditSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto p-0">
+      <SheetContent className="w-full sm:w-[600px] sm:max-w-[600px] overflow-y-auto p-0">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col h-full"
@@ -256,7 +256,7 @@ export function DiscountEditSheet({
               </div>
 
               <div className="bg-white dark:bg-card border dark:border-gray-700 rounded-lg p-5 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label
                       htmlFor="code"
@@ -320,7 +320,7 @@ export function DiscountEditSheet({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label
                       htmlFor="value"
@@ -399,7 +399,7 @@ export function DiscountEditSheet({
               </div>
 
               <div className="bg-white dark:bg-card border dark:border-gray-700 rounded-lg p-5 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Date de début */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -617,7 +617,7 @@ export function DiscountEditSheet({
               </div>
 
               <div className="bg-white dark:bg-card border dark:border-gray-700 rounded-lg p-5">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {discount.usedCount}
@@ -666,20 +666,20 @@ export function DiscountEditSheet({
           </div>
 
           <SheetFooter className="px-6 py-4 border-t bg-gray-50/50 dark:bg-card/50">
-            <div className="flex items-center gap-3 w-full">
+            <div className="flex flex-col md:flex-row items-center gap-3 w-full">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
-                className="flex-1 h-11 cursor-pointer"
+                className="w-full md:flex-1 h-11 cursor-pointer"
               >
                 Annuler
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 h-11 bg-primary cursor-pointer"
+                className="w-full md:flex-1 h-11 bg-primary cursor-pointer"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">

@@ -160,8 +160,8 @@ export function OrdersTable({
   return (
     <>
       {/* Filtres */}
-      <div className="flex items-center justify-between gap-4 mb-6 p-4 bg-white dark:bg-card border rounded-lg">
-        <div className="flex items-center gap-4 flex-1">
+      <div className="flex flex-col space-y-4 p-4 bg-white dark:bg-card border rounded-lg mb-6 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+        <div className="flex flex-col space-y-3 sm:flex-row sm:flex-1 sm:items-center sm:space-x-2 sm:space-y-0">
           <div className="flex items-center gap-2">
             <IconFilter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -169,42 +169,47 @@ export function OrdersTable({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <IconSearch className="h-4 w-4 text-gray-400" />
+          <div className="relative">
+            <IconSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Rechercher par client, numéro..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="max-w-sm"
+              className="pl-8 w-full sm:max-w-sm"
             />
             {searchTerm && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={clearSearch}
-                className="h-8 w-8 p-0"
+                className="absolute right-1 top-1 h-8 w-8 p-0"
               >
                 <IconX className="h-4 w-4" />
               </Button>
             )}
           </div>
 
-          <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              {Object.entries(STATUS_CONFIG).map(([status, config]) => (
-                <SelectItem key={status} value={status}>
-                  <div className="flex items-center gap-2">
-                    <config.icon className="h-4 w-4" />
-                    {config.label}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium hidden sm:block">
+              Statut:
+            </span>
+            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Tous les statuts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                {Object.entries(STATUS_CONFIG).map(([status, config]) => (
+                  <SelectItem key={status} value={status}>
+                    <div className="flex items-center gap-2">
+                      <config.icon className="h-4 w-4" />
+                      {config.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="text-sm text-gray-500 dark:text-gray-400">

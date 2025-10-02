@@ -273,11 +273,11 @@ export default function AjouterCommandePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label
                   htmlFor="customerName"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Nom du client
                 </Label>
@@ -291,7 +291,7 @@ export default function AjouterCommandePage() {
               <div className="space-y-2">
                 <Label
                   htmlFor="customerEmail"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Adresse email
                 </Label>
@@ -313,7 +313,7 @@ export default function AjouterCommandePage() {
             <div className="space-y-2">
               <Label
                 htmlFor="customerPhone"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Numéro de téléphone
               </Label>
@@ -341,7 +341,7 @@ export default function AjouterCommandePage() {
             <div className="space-y-2">
               <Label
                 htmlFor="customerStreet"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Adresse
               </Label>
@@ -353,11 +353,11 @@ export default function AjouterCommandePage() {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label
                   htmlFor="customerPostalCode"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Code postal
                 </Label>
@@ -371,7 +371,7 @@ export default function AjouterCommandePage() {
               <div className="space-y-2">
                 <Label
                   htmlFor="customerCity"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Ville
                 </Label>
@@ -385,7 +385,7 @@ export default function AjouterCommandePage() {
               <div className="space-y-2">
                 <Label
                   htmlFor="customerCountry"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Pays
                 </Label>
@@ -422,8 +422,8 @@ export default function AjouterCommandePage() {
                   <TableHeader>
                     <TableRow className="bg-gray-50/50 dark:bg-card">
                       <TableHead className="font-semibold">Produit</TableHead>
-                      <TableHead className="font-semibold">Quantité</TableHead>
-                      <TableHead className="font-semibold">
+                      <TableHead className="font-semibold hidden sm:table-cell">Quantité</TableHead>
+                      <TableHead className="font-semibold hidden sm:table-cell">
                         Prix unit.
                       </TableHead>
                       <TableHead className="font-semibold">Total</TableHead>
@@ -442,32 +442,35 @@ export default function AjouterCommandePage() {
                       >
                         <TableCell>
                           <div className="py-2">
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-gray-900 dark:text-gray-100">
                               {item.nom}
                             </div>
                             {(item.taille || item.couleur) && (
                               <div className="text-sm text-gray-500 mt-1">
                                 {item.taille && (
-                                  <span className="bg-gray-100 px-2 py-1 rounded text-xs mr-2">
+                                  <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs mr-2">
                                     Taille: {item.taille}
                                   </span>
                                 )}
                                 {item.couleur && (
-                                  <span className="bg-gray-100 px-2 py-1 rounded text-xs">
+                                  <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">
                                     Couleur: {item.couleur}
                                   </span>
                                 )}
                               </div>
                             )}
+                            <div className="text-sm text-gray-500 mt-1 sm:hidden">
+                              Qté: {item.quantite} • {formatPrice(item.prix)}
+                            </div>
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium hidden sm:table-cell">
                           {item.quantite}
                         </TableCell>
-                        <TableCell className="text-gray-700 dark:text-gray-100">
+                        <TableCell className="text-gray-700 dark:text-gray-100 hidden sm:table-cell">
                           {formatPrice(item.prix)}
                         </TableCell>
-                        <TableCell className="font-bold text-gray-900">
+                        <TableCell className="font-bold text-gray-900 dark:text-gray-100">
                           {formatPrice(item.prix * item.quantite)}
                         </TableCell>
                         <TableCell>
@@ -503,7 +506,7 @@ export default function AjouterCommandePage() {
                 </h4>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Produit
@@ -576,8 +579,8 @@ export default function AjouterCommandePage() {
                   )}
               </div>
 
-              <div className="flex items-end gap-4">
-                <div className="flex-1 space-y-2">
+              <div className="flex flex-col md:flex-row items-end gap-4">
+                <div className="flex-1 space-y-2 w-full">
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Quantité
                   </Label>
@@ -592,7 +595,7 @@ export default function AjouterCommandePage() {
                 <Button
                   type="button"
                   onClick={handleAddProduct}
-                  className="flex items-center gap-2 px-6 h-10 bg-white cursor-pointer"
+                  className="flex items-center gap-2 px-6 h-10 bg-white cursor-pointer w-full md:w-auto"
                   disabled={!selectedProduct}
                 >
                   <IconPlus className="h-4 w-4" />
@@ -610,7 +613,7 @@ export default function AjouterCommandePage() {
                 </h4>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Type de réduction
@@ -734,13 +737,13 @@ export default function AjouterCommandePage() {
         </Card>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard/commandes">
+        <div className="flex flex-col md:flex-row items-center gap-3">
+          <Link href="/dashboard/commandes" className="w-full md:w-auto">
             <Button
               type="button"
               variant="outline"
               disabled={isLoading}
-              className="flex-1 cursor-pointer"
+              className="w-full cursor-pointer"
             >
               Annuler
             </Button>
@@ -748,7 +751,7 @@ export default function AjouterCommandePage() {
           <Button
             type="submit"
             disabled={isLoading || orderItems.length === 0}
-            className="flex-1 bg-white cursor-pointer"
+            className="w-full bg-white cursor-pointer"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

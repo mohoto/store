@@ -282,7 +282,7 @@ export function OrderEditSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[700px] sm:max-w-[700px] overflow-y-auto p-0">
+      <SheetContent className="w-full sm:w-[700px] sm:max-w-[700px] overflow-y-auto p-0">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col h-full"
@@ -331,7 +331,7 @@ export function OrderEditSheet({
               </div>
 
               <div className="bg-white dark:bg-card border dark:border-gray-700 rounded-lg p-5 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label
                       htmlFor="customerName"
@@ -412,7 +412,7 @@ export function OrderEditSheet({
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label
                       htmlFor="customerPostalCode"
@@ -540,10 +540,10 @@ export function OrderEditSheet({
                     <TableHeader>
                       <TableRow className="bg-gray-50/50 dark:bg-gray-700/50">
                         <TableHead className="font-semibold">Produit</TableHead>
-                        <TableHead className="font-semibold">
+                        <TableHead className="font-semibold hidden sm:table-cell">
                           Quantité
                         </TableHead>
-                        <TableHead className="font-semibold">
+                        <TableHead className="font-semibold hidden sm:table-cell">
                           Prix unit.
                         </TableHead>
                         <TableHead className="font-semibold">Total</TableHead>
@@ -579,12 +579,15 @@ export function OrderEditSheet({
                                   )}
                                 </div>
                               )}
+                              <div className="text-sm text-gray-500 mt-1 sm:hidden">
+                                Qté: {item.quantite} • {formatPrice(item.prix)}
+                              </div>
                             </div>
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium hidden sm:table-cell">
                             {item.quantite}
                           </TableCell>
-                          <TableCell className="text-gray-700 dark:text-gray-300">
+                          <TableCell className="text-gray-700 dark:text-gray-300 hidden sm:table-cell">
                             {formatPrice(item.prix)}
                           </TableCell>
                           <TableCell className="font-bold text-gray-900 dark:text-gray-100">
@@ -625,7 +628,7 @@ export function OrderEditSheet({
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Produit
@@ -656,48 +659,50 @@ export function OrderEditSheet({
                     </Select>
                   </div>
 
-                  {selectedProduct && selectedProduct.variants && selectedProduct.variants.length > 0 && (
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Variante
-                      </Label>
-                      <Select
-                        value={selectedVariant?.id || ""}
-                        onValueChange={(value) => {
-                          const variant = selectedProduct.variants.find(
-                            (v) => v.id === value
-                          );
-                          setSelectedVariant(variant || null);
-                        }}
-                      >
-                        <SelectTrigger className="h-10 bg-white dark:bg-black">
-                          <SelectValue placeholder="Sélectionner une variante" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {selectedProduct.variants.map((variant) => (
-                            <SelectItem key={variant.id} value={variant.id}>
-                              <div className="flex justify-between items-center w-full">
-                                <span>
-                                  {variant.taille && `${variant.taille}`}
-                                  {variant.taille && variant.couleur && " • "}
-                                  {variant.couleur && `${variant.couleur}`}
-                                </span>
-                                {variant.prix && (
-                                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
-                                    {formatPrice(variant.prix)}
+                  {selectedProduct &&
+                    selectedProduct.variants &&
+                    selectedProduct.variants.length > 0 && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Variante
+                        </Label>
+                        <Select
+                          value={selectedVariant?.id || ""}
+                          onValueChange={(value) => {
+                            const variant = selectedProduct.variants.find(
+                              (v) => v.id === value
+                            );
+                            setSelectedVariant(variant || null);
+                          }}
+                        >
+                          <SelectTrigger className="h-10 bg-white dark:bg-black">
+                            <SelectValue placeholder="Sélectionner une variante" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {selectedProduct.variants.map((variant) => (
+                              <SelectItem key={variant.id} value={variant.id}>
+                                <div className="flex justify-between items-center w-full">
+                                  <span>
+                                    {variant.taille && `${variant.taille}`}
+                                    {variant.taille && variant.couleur && " • "}
+                                    {variant.couleur && `${variant.couleur}`}
                                   </span>
-                                )}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
+                                  {variant.prix && (
+                                    <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                                      {formatPrice(variant.prix)}
+                                    </span>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                 </div>
 
-                <div className="flex items-end gap-4">
-                  <div className="flex-1 space-y-2">
+                <div className="flex flex-col md:flex-row items-end gap-4">
+                  <div className="flex-1 space-y-2 w-full">
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Quantité
                     </Label>
@@ -714,7 +719,7 @@ export function OrderEditSheet({
                   <Button
                     type="button"
                     onClick={handleAddProduct}
-                    className="flex items-center gap-2 px-6 h-10 bg-white cursor-pointer"
+                    className="flex items-center gap-2 px-6 h-10 bg-white cursor-pointer w-full md:w-auto"
                     disabled={!selectedProduct}
                   >
                     <IconPlus className="h-4 w-4" />
@@ -732,7 +737,7 @@ export function OrderEditSheet({
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Type de réduction
@@ -843,20 +848,20 @@ export function OrderEditSheet({
           </div>
 
           <SheetFooter className="px-6 py-4 border-t bg-gray-50/50 dark:bg-card/50">
-            <div className="flex items-center gap-3 w-full">
+            <div className="flex flex-col md:flex-row items-center gap-3 w-full">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
-                className="flex-1 h-11 cursor-pointer"
+                className="w-full md:flex-1 h-11 cursor-pointer"
               >
                 Annuler
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 h-11 bg-white cursor-pointer"
+                className="w-full md:flex-1 h-11 bg-white cursor-pointer"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">

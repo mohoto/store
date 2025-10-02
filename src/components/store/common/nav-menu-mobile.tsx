@@ -74,7 +74,7 @@ export const NavBarMobile = () => {
         <DrawerTrigger>
           <IconMenuDeep className="h-8 w-8" />
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="h-full w-full sm:max-w-md sm:ml-auto right-0 top-0 bottom-0 fixed z-50 sm:rounded-l-lg data-[vaul-drawer-direction=right]:w-full sm:data-[vaul-drawer-direction=right]:w-auto">
           <DrawerHeader>
             <DrawerTitle className="flex justify-end">
               <DrawerClose asChild>
